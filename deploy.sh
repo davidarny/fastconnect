@@ -327,29 +327,30 @@ setup_ssl() {
     # Check if certificates already exist
     if [ -f "/etc/letsencrypt/live/$DOMAIN/fullchain.pem" ]; then
         print_warning "SSL certificates already exist for $DOMAIN"
-        return 0
-    fi
-    
-    print_status "Obtaining SSL certificate for $DOMAIN..."
-    
-    # Stop nginx temporarily for standalone mode
-    systemctl stop nginx >> "$LOG_FILE" 2>&1
-    
-    # Obtain certificate using standalone mode
-    if certbot certonly --standalone --non-interactive --agree-tos --email "$EMAIL" -d "$DOMAIN" -d "www.$DOMAIN" >> "$LOG_FILE" 2>&1; then
-        print_success "SSL certificate obtained successfully"
+        print_status "Updating Nginx configuration with existing SSL certificates..."
     else
-        print_error "Failed to obtain SSL certificate"
+        print_status "Obtaining SSL certificate for $DOMAIN..."
+        
+        # Stop nginx temporarily for standalone mode
+        systemctl stop nginx >> "$LOG_FILE" 2>&1
+        
+        # Obtain certificate using standalone mode
+        if certbot certonly --standalone --non-interactive --agree-tos --email "$EMAIL" -d "$DOMAIN" -d "www.$DOMAIN" >> "$LOG_FILE" 2>&1; then
+            print_success "SSL certificate obtained successfully"
+        else
+            print_error "Failed to obtain SSL certificate"
+            systemctl start nginx >> "$LOG_FILE" 2>&1
+            return 1
+        fi
+        
+        # Start nginx again
         systemctl start nginx >> "$LOG_FILE" 2>&1
-        return 1
     fi
     
-    # Start nginx again
-    systemctl start nginx >> "$LOG_FILE" 2>&1
-    
-    # Update Nginx configuration with SSL
+    # Always update Nginx configuration with SSL (whether certificates are new or existing)
     print_status "Updating Nginx configuration with SSL..."
     
+    # Update Nginx configuration with SSL
     cat > "$NGINX_CONF" << EOF
 server {
     listen 80;
@@ -383,7 +384,7 @@ server {
     add_header X-Content-Type-Options "nosniff" always;
     add_header X-XSS-Protection "1; mode=block" always;
     add_header Referrer-Policy "no-referrer-when-downgrade" always;
-    add_header Content-Security-Policy "default-src 'self' http: https: data: blob: 'unsafe-inline'" always;
+    add_header Content-Security-Policy "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval'" always;
     add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
     
     # Gzip Compression
