@@ -136,9 +136,6 @@ deploy_from_current() {
         exit 1
     fi
     
-    # Copy files to project directory
-    rsync -av --exclude='.git' --exclude='logs' "$current_dir/" "$PROJECT_DIR/"
-    
     # Set proper permissions
     chown -R www-data:www-data "$PROJECT_DIR"
     chmod -R 755 "$PROJECT_DIR"
