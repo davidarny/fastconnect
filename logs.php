@@ -2,15 +2,6 @@
 // Simple log viewer for FastConnect VPN landing page
 // Access this file directly to view logs
 
-// Security check - you might want to add authentication here
-$allowed_ips = ['127.0.0.1', '::1']; // Add your IP addresses here
-$client_ip = $_SERVER['REMOTE_ADDR'] ?? '';
-
-if (!in_array($client_ip, $allowed_ips) && !isset($_GET['allow'])) {
-    http_response_code(403);
-    exit('Access denied. Add your IP to the allowed list or use ?allow=1 parameter.');
-}
-
 $log_dir = __DIR__ . '/logs';
 $log_type = $_GET['type'] ?? 'requests';
 $date = $_GET['date'] ?? date('Y-m-d');

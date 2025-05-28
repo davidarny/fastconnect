@@ -754,59 +754,14 @@
                 </p>
             </div>
 
-            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
                 <!-- Free Plan -->
                 <div class="border-2 border-gray-200 rounded-2xl p-6 hover:border-emerald-200 transition-all duration-300 hover:scale-105 hover:shadow-lg">
                     <div class="text-center">
                         <h3 class="text-2xl font-bold text-gray-900 mb-2">Free</h3>
-                        <p class="text-gray-600 mb-6">Try FastConnect VPN risk-free</p>
-                        <div class="mb-6">
-                            <span class="text-4xl font-bold text-gray-900">$0</span>
-                            <span class="text-gray-600">/month</span>
-                        </div>
-                        <?php if ($is_offer_page): ?>
-                        <button @click="downloadApp()" class="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white py-3 px-6 rounded-lg font-medium transition-all duration-300 mb-6">
-                            <i data-lucide="download" class="h-4 w-4"></i>
-                            Download Now
-                        </button>
-                        <?php else: ?>
-                        <button disabled class="w-full flex items-center justify-center gap-2 bg-gray-400 text-white py-3 px-6 rounded-lg font-medium transition-all duration-300 mb-6 cursor-not-allowed opacity-75">
-                            <i data-lucide="clock" class="h-4 w-4"></i>
-                            Coming Soon
-                        </button>
-                        <?php endif; ?>
-                    </div>
-                    <ul class="space-y-3 text-gray-600 text-sm">
-                        <li class="flex items-center">
-                            <i data-lucide="check" class="h-4 w-4 text-emerald-600 mr-3 flex-shrink-0"></i>
-                            1 Device Connection
-                        </li>
-                        <li class="flex items-center">
-                            <i data-lucide="check" class="h-4 w-4 text-emerald-600 mr-3 flex-shrink-0"></i>
-                            Basic VPN Protection
-                        </li>
-                        <li class="flex items-center">
-                            <i data-lucide="check" class="h-4 w-4 text-emerald-600 mr-3 flex-shrink-0"></i>
-                            5 Server Locations
-                        </li>
-                        <li class="flex items-center">
-                            <i data-lucide="check" class="h-4 w-4 text-emerald-600 mr-3 flex-shrink-0"></i>
-                            Community Support
-                        </li>
-                        <li class="flex items-center text-gray-400">
-                            <i data-lucide="x" class="h-4 w-4 text-gray-400 mr-3 flex-shrink-0"></i>
-                            500MB Daily Limit
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Basic Plan -->
-                <div class="border-2 border-gray-200 rounded-2xl p-6 hover:border-emerald-200 transition-all duration-300 hover:scale-105 hover:shadow-lg">
-                    <div class="text-center">
-                        <h3 class="text-2xl font-bold text-gray-900 mb-2">Basic</h3>
                         <p class="text-gray-600 mb-6">Perfect for personal use</p>
                         <div class="mb-6">
-                            <span class="text-4xl font-bold text-gray-900">$9.99</span>
+                            <span class="text-4xl font-bold text-gray-900">$0</span>
                             <span class="text-gray-600">/month</span>
                         </div>
                         <?php if ($is_offer_page): ?>
@@ -845,16 +800,16 @@
                     </ul>
                 </div>
 
-                <!-- Pro Plan (Most Popular) -->
+                <!-- Basic Plan -->
                 <div class="border-2 border-emerald-500 rounded-2xl p-6 relative hover:border-emerald-600 transition-all duration-300 hover:scale-105 hover:shadow-xl bg-gradient-to-b from-emerald-50 to-white">
                     <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
                         <span class="bg-emerald-500 text-white px-4 py-2 rounded-full text-sm font-medium">Most Popular</span>
                     </div>
                     <div class="text-center">
-                        <h3 class="text-2xl font-bold text-gray-900 mb-2">Pro</h3>
+                        <h3 class="text-2xl font-bold text-gray-900 mb-2">Basic</h3>
                         <p class="text-gray-600 mb-6">Best for families and teams</p>
                         <div class="mb-6">
-                            <span class="text-4xl font-bold text-emerald-600">$19.99</span>
+                            <span class="text-4xl font-bold text-emerald-600">$9.99</span>
                             <span class="text-gray-600">/month</span>
                         </div>
                         <?php if ($is_offer_page): ?>
@@ -893,19 +848,26 @@
                     </ul>
                 </div>
 
-                <!-- Enterprise Plan -->
+                <!-- Pro Plan -->
                 <div class="border-2 border-gray-200 rounded-2xl p-6 hover:border-emerald-200 transition-all duration-300 hover:scale-105 hover:shadow-lg">
                     <div class="text-center">
-                        <h3 class="text-2xl font-bold text-gray-900 mb-2">Enterprise</h3>
+                        <h3 class="text-2xl font-bold text-gray-900 mb-2">Pro</h3>
                         <p class="text-gray-600 mb-6">For businesses and power users</p>
                         <div class="mb-6">
-                            <span class="text-4xl font-bold text-gray-900">$49.99</span>
+                            <span class="text-4xl font-bold text-gray-900">$19.99</span>
                             <span class="text-gray-600">/month</span>
                         </div>
+                        <?php if ($is_offer_page): ?>
+                        <button @click="downloadApp()" class="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white py-3 px-6 rounded-lg font-medium transition-all duration-300 mb-6">
+                            <i data-lucide="download" class="h-4 w-4"></i>
+                            Download Now
+                        </button>
+                        <?php else: ?>
                         <button disabled class="w-full flex items-center justify-center gap-2 bg-gray-400 text-white py-3 px-6 rounded-lg font-medium transition-all duration-300 mb-6 cursor-not-allowed opacity-75">
                             <i data-lucide="clock" class="h-4 w-4"></i>
                             Coming Soon
                         </button>
+                        <?php endif; ?>
                     </div>
                     <ul class="space-y-3 text-gray-600 text-sm">
                         <li class="flex items-center">
