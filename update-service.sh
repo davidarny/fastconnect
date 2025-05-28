@@ -1,16 +1,12 @@
 #!/bin/bash
 
 # FastConnect Service Update Script
-# This script updates the FastConnect landing page with backup and rollback capabilities
+# This script deploys the FastConnect landing page from current directory
 
 set -e
 
 # Configuration
 PROJECT_DIR="/var/www/fastconnect"
-BACKUP_DIR="/var/backups/fastconnect"
-REPO_URL="https://github.com/davidarny/fastconnect.git"
-BRANCH="main"
-SERVICE_NAME="fastconnect"
 NGINX_CONFIG="/etc/nginx/sites-available/fastconnect"
 PHP_FPM_SERVICE="php8.1-fpm"
 
@@ -44,84 +40,42 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
-# Function to create backup
-create_backup() {
-    local backup_timestamp=$(date +%Y%m%d_%H%M%S)
-    local backup_path="$BACKUP_DIR/$backup_timestamp"
-    
-    log "Creating backup at $backup_path..."
-    
-    # Create backup directory
-    mkdir -p "$backup_path"
-    
-    # Backup current files
-    if [[ -d "$PROJECT_DIR" ]]; then
-        cp -r "$PROJECT_DIR" "$backup_path/files"
-        log "Files backed up successfully"
-    else
-        warning "Project directory does not exist, skipping file backup"
-    fi
-    
-    # Backup nginx configuration
-    if [[ -f "$NGINX_CONFIG" ]]; then
-        cp "$NGINX_CONFIG" "$backup_path/nginx.conf"
-        log "Nginx configuration backed up"
-    fi
-    
-    # Backup database if exists (for future use)
-    # mysqldump -u root -p fastconnect > "$backup_path/database.sql"
-    
-    # Create backup metadata
-    cat > "$backup_path/metadata.json" << EOF
-{
-    "timestamp": "$backup_timestamp",
-    "project_dir": "$PROJECT_DIR",
-    "nginx_config": "$NGINX_CONFIG",
-    "git_commit": "$(cd $PROJECT_DIR 2>/dev/null && git rev-parse HEAD 2>/dev/null || echo 'unknown')",
-    "git_branch": "$(cd $PROJECT_DIR 2>/dev/null && git branch --show-current 2>/dev/null || echo 'unknown')",
-    "php_version": "$(php -v | head -n1)",
-    "nginx_version": "$(nginx -v 2>&1)"
-}
-EOF
-    
-    # Keep only last 10 backups
-    cd "$BACKUP_DIR"
-    ls -t | tail -n +11 | xargs -r rm -rf
-    
-    log "Backup created successfully: $backup_path"
-    echo "$backup_path" > /tmp/fastconnect_last_backup
-}
-
 # Function to check prerequisites
 check_prerequisites() {
     log "Checking prerequisites..."
     
-    # Check if git is installed
-    if ! command -v git &> /dev/null; then
-        error "Git is not installed"
-        exit 1
-    fi
+    local missing_deps=()
     
     # Check if nginx is installed
     if ! command -v nginx &> /dev/null; then
-        error "Nginx is not installed"
-        exit 1
+        missing_deps+=("nginx")
     fi
     
     # Check if PHP is installed
     if ! command -v php &> /dev/null; then
-        error "PHP is not installed"
-        exit 1
+        missing_deps+=("php")
+    else
+        # Check if required PHP extensions are available
+        local required_extensions=("curl" "mbstring" "openssl" "json" "filter")
+        local missing_extensions=()
+        
+        for ext in "${required_extensions[@]}"; do
+            if ! php -m | grep -q "$ext"; then
+                missing_extensions+=("$ext")
+            fi
+        done
+        
+        if [[ ${#missing_extensions[@]} -gt 0 ]]; then
+            missing_deps+=("php-extensions")
+            warning "Missing PHP extensions: ${missing_extensions[*]}"
+        fi
     fi
     
-    # Check if required PHP extensions are available
-    local required_extensions=("curl" "mbstring" "openssl" "json" "filter")
-    for ext in "${required_extensions[@]}"; do
-        if ! php -m | grep -q "$ext"; then
-            error "Required PHP extension '$ext' is not installed"
-            exit 1
-        fi
-    done
+    if [[ ${#missing_deps[@]} -gt 0 ]]; then
+        error "Missing dependencies: ${missing_deps[*]}"
+        info "Run './install-dependencies.sh' to install missing dependencies"
+        exit 1
+    fi
     
     log "Prerequisites check passed"
 }
@@ -170,22 +124,20 @@ reload_services() {
     log "PHP-FPM reloaded"
 }
 
-# Function to deploy from git
-deploy_from_git() {
-    log "Deploying from Git repository..."
+# Function to deploy from current directory
+deploy_from_current() {
+    local current_dir="$(pwd)"
     
-    if [[ -d "$PROJECT_DIR/.git" ]]; then
-        # Update existing repository
-        cd "$PROJECT_DIR"
-        git fetch origin
-        git reset --hard "origin/$BRANCH"
-        log "Repository updated from origin/$BRANCH"
-    else
-        # Clone repository
-        rm -rf "$PROJECT_DIR"
-        git clone -b "$BRANCH" "$REPO_URL" "$PROJECT_DIR"
-        log "Repository cloned from $REPO_URL"
+    log "Deploying from current directory: $current_dir"
+    
+    # Verify we have the required files
+    if [[ ! -f "index.php" ]]; then
+        error "index.php not found in current directory. Are you in the correct project directory?"
+        exit 1
     fi
+    
+    # Copy files to project directory
+    rsync -av --exclude='.git' --exclude='logs' "$current_dir/" "$PROJECT_DIR/"
     
     # Set proper permissions
     chown -R www-data:www-data "$PROJECT_DIR"
@@ -200,100 +152,6 @@ deploy_from_git() {
     log "Deployment completed successfully"
 }
 
-# Function to deploy from local files
-deploy_from_local() {
-    local source_dir="$1"
-    
-    if [[ ! -d "$source_dir" ]]; then
-        error "Source directory '$source_dir' does not exist"
-        exit 1
-    fi
-    
-    log "Deploying from local directory: $source_dir"
-    
-    # Copy files
-    rsync -av --delete "$source_dir/" "$PROJECT_DIR/"
-    
-    # Set proper permissions
-    chown -R www-data:www-data "$PROJECT_DIR"
-    chmod -R 755 "$PROJECT_DIR"
-    chmod -R 644 "$PROJECT_DIR"/*.php
-    
-    # Create logs directory if it doesn't exist
-    mkdir -p "$PROJECT_DIR/logs"
-    chown www-data:www-data "$PROJECT_DIR/logs"
-    chmod 755 "$PROJECT_DIR/logs"
-    
-    log "Local deployment completed successfully"
-}
-
-# Function to run health checks
-run_health_checks() {
-    log "Running comprehensive health checks..."
-    
-    # Check if our comprehensive health check script exists
-    local health_script="$PROJECT_DIR/healthcheck.sh"
-    if [[ -f "$health_script" ]]; then
-        # Run the comprehensive health check script
-        if "$health_script" --quiet; then
-            log "Comprehensive health checks passed"
-            return 0
-        else
-            local exit_code=$?
-            if [[ $exit_code -eq 1 ]]; then
-                warning "Health checks completed with warnings"
-                # Continue deployment but log warnings
-                "$health_script" --format text | grep -E "\[⚠\]|\[✗\]" || true
-                return 0
-            else
-                error "Health checks failed"
-                # Show failed checks
-                "$health_script" --format text | grep -E "\[⚠\]|\[✗\]" || true
-                return 1
-            fi
-        fi
-    else
-        # Fallback to basic health checks if comprehensive script not available
-        warning "Comprehensive health check script not found, using basic checks"
-        run_basic_health_checks
-    fi
-}
-
-# Basic health checks (fallback)
-run_basic_health_checks() {
-    log "Running basic health checks..."
-    
-    # Check if nginx is running
-    if ! systemctl is-active --quiet nginx; then
-        error "Nginx is not running"
-        return 1
-    fi
-    
-    # Check if PHP-FPM is running
-    if ! systemctl is-active --quiet "$PHP_FPM_SERVICE"; then
-        error "PHP-FPM is not running"
-        return 1
-    fi
-    
-    # Check if website is accessible
-    local response_code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost/ || echo "000")
-    if [[ "$response_code" != "200" ]]; then
-        warning "Website returned HTTP $response_code (expected 200)"
-    else
-        log "Website is accessible (HTTP 200)"
-    fi
-    
-    # Check PHP syntax
-    if find "$PROJECT_DIR" -name "*.php" -exec php -l {} \; 2>&1 | grep -q "Parse error"; then
-        error "PHP syntax errors found"
-        return 1
-    else
-        log "PHP syntax check passed"
-    fi
-    
-    log "Basic health checks completed successfully"
-}
-
 # Function to update nginx configuration
 update_nginx_config() {
     log "Updating nginx configuration..."
@@ -302,8 +160,21 @@ update_nginx_config() {
     if [[ -f "$PROJECT_DIR/nginx.conf" ]]; then
         cp "$PROJECT_DIR/nginx.conf" "$NGINX_CONFIG"
         log "Nginx configuration updated from project files"
+        
+        # Enable the site
+        if [[ ! -L "/etc/nginx/sites-enabled/fastconnect" ]]; then
+            ln -s "$NGINX_CONFIG" /etc/nginx/sites-enabled/
+            log "FastConnect site enabled"
+        fi
+        
+        # Remove default nginx site if it exists
+        if [[ -L "/etc/nginx/sites-enabled/default" ]]; then
+            rm /etc/nginx/sites-enabled/default
+            log "Default nginx site disabled"
+        fi
     else
-        log "No nginx configuration found in project, keeping existing"
+        warning "No nginx configuration found in project"
+        return 1
     fi
     
     # Test nginx configuration
@@ -320,14 +191,6 @@ show_status() {
     log "Deployment Status:"
     echo "===================="
     
-    # Git information
-    if [[ -d "$PROJECT_DIR/.git" ]]; then
-        cd "$PROJECT_DIR"
-        echo "Git Commit: $(git rev-parse HEAD)"
-        echo "Git Branch: $(git branch --show-current)"
-        echo "Last Commit: $(git log -1 --pretty=format:'%h - %s (%cr) <%an>')"
-    fi
-    
     # Service status
     echo "Nginx Status: $(systemctl is-active nginx)"
     echo "PHP-FPM Status: $(systemctl is-active $PHP_FPM_SERVICE)"
@@ -336,190 +199,62 @@ show_status() {
     echo "Project Directory Owner: $(stat -c '%U:%G' $PROJECT_DIR)"
     echo "Project Directory Permissions: $(stat -c '%a' $PROJECT_DIR)"
     
-    # Last backup
-    if [[ -f "/tmp/fastconnect_last_backup" ]]; then
-        echo "Last Backup: $(cat /tmp/fastconnect_last_backup)"
-    fi
+    # Check if main files exist
+    echo "Main Files:"
+    for file in "index.php" "nginx.conf"; do
+        if [[ -f "$PROJECT_DIR/$file" ]]; then
+            echo "  ✓ $file exists"
+        else
+            echo "  ✗ $file missing"
+        fi
+    done
     
     echo "===================="
 }
 
-# Function to rollback to previous version
-rollback() {
-    local backup_path="$1"
-    
-    if [[ -z "$backup_path" ]]; then
-        # Use last backup
-        if [[ -f "/tmp/fastconnect_last_backup" ]]; then
-            backup_path=$(cat /tmp/fastconnect_last_backup)
-        else
-            error "No backup path specified and no last backup found"
-            exit 1
-        fi
-    fi
-    
-    if [[ ! -d "$backup_path" ]]; then
-        error "Backup directory '$backup_path' does not exist"
-        exit 1
-    fi
-    
-    log "Rolling back to backup: $backup_path"
-    
-    # Stop services
-    stop_services
-    
-    # Restore files
-    if [[ -d "$backup_path/files" ]]; then
-        rm -rf "$PROJECT_DIR"
-        cp -r "$backup_path/files" "$PROJECT_DIR"
-        log "Files restored from backup"
-    fi
-    
-    # Restore nginx configuration
-    if [[ -f "$backup_path/nginx.conf" ]]; then
-        cp "$backup_path/nginx.conf" "$NGINX_CONFIG"
-        log "Nginx configuration restored from backup"
-    fi
-    
-    # Start services
-    start_services
-    
-    # Run health checks
-    if run_health_checks; then
-        log "Rollback completed successfully"
-    else
-        error "Rollback completed but health checks failed"
-        exit 1
-    fi
-}
-
 # Main deployment function
 deploy() {
-    local source="$1"
-    
-    log "Starting FastConnect service update..."
+    log "Starting FastConnect service deployment..."
     
     check_prerequisites
-    create_backup
-    
-    # Deploy based on source type
-    if [[ "$source" == "git" ]] || [[ -z "$source" ]]; then
-        deploy_from_git
-    elif [[ -d "$source" ]]; then
-        deploy_from_local "$source"
-    else
-        error "Invalid source: $source"
-        exit 1
-    fi
-    
+    deploy_from_current
     update_nginx_config
     reload_services
     
-    # Run health checks
-    if run_health_checks; then
-        log "Deployment completed successfully!"
-        show_status
-    else
-        error "Health checks failed, consider rolling back"
-        exit 1
-    fi
-}
-
-# Function to run standalone health checks
-run_standalone_health_checks() {
-    local format="${1:-text}"
-    local output_file="$2"
-    
-    # Check if our comprehensive health check script exists
-    local health_script="$PROJECT_DIR/healthcheck.sh"
-    if [[ -f "$health_script" ]]; then
-        log "Running comprehensive health checks..."
-        
-        # Build command arguments
-        local cmd_args=()
-        if [[ "$format" != "text" ]]; then
-            cmd_args+=("--format" "$format")
-        fi
-        if [[ -n "$output_file" ]]; then
-            cmd_args+=("--output" "$output_file")
-        fi
-        
-        # Run the comprehensive health check
-        "$health_script" "${cmd_args[@]}"
-        local exit_code=$?
-        
-        case $exit_code in
-            0)
-                log "All health checks passed"
-                ;;
-            1)
-                warning "Health checks completed with warnings"
-                ;;
-            2)
-                error "Health checks failed"
-                ;;
-            *)
-                error "Health check script returned unexpected exit code: $exit_code"
-                ;;
-        esac
-        
-        return $exit_code
-    else
-        # Fallback to basic health checks
-        warning "Comprehensive health check script not found at $health_script"
-        log "Using basic health checks instead"
-        run_basic_health_checks
-        return $?
-    fi
+    log "Deployment completed successfully!"
+    show_status
 }
 
 # Help function
 show_help() {
-    echo "Usage: $0 [COMMAND] [OPTIONS]"
+    echo "Usage: $0 [COMMAND]"
     echo ""
-    echo "FastConnect Service Update Script"
+    echo "FastConnect Service Deployment Script"
     echo ""
     echo "Commands:"
-    echo "  deploy [source]     Deploy the service (default: git)"
-    echo "  rollback [backup]   Rollback to previous version"
+    echo "  deploy              Deploy the service from current directory"
     echo "  status              Show deployment status"
-    echo "  backup              Create backup only"
-    echo "  health [format] [output_file]  Run health checks"
-    echo ""
-    echo "Options:"
-    echo "  source              'git' or path to local directory"
-    echo "  backup              Path to backup directory"
-    echo "  format              Health check output format: text, json (default: text)"
-    echo "  output_file         Save health check output to file"
     echo ""
     echo "Examples:"
-    echo "  $0 deploy                    # Deploy from git"
-    echo "  $0 deploy /path/to/files     # Deploy from local directory"
-    echo "  $0 rollback                  # Rollback to last backup"
-    echo "  $0 rollback /var/backups/... # Rollback to specific backup"
-    echo "  $0 status                    # Show current status"
-    echo "  $0 health                    # Run health checks with text output"
-    echo "  $0 health json               # Run health checks with JSON output"
-    echo "  $0 health text health.log    # Save health check output to file"
+    echo "  $0 deploy           # Deploy from current directory"
+    echo "  $0 status           # Show current status"
+    echo ""
+    echo "Other available scripts:"
+    echo "  ./install-dependencies.sh   # Install required dependencies"
+    echo "  ./healthcheck.sh            # Run health checks"
+    echo "  ./revert-changes.sh         # Revert deployment"
+    echo ""
+    echo "Note: This script must be run from the FastConnect project directory"
+    echo "      and will deploy files from the current directory to $PROJECT_DIR"
 }
 
 # Main execution
 case "${1:-deploy}" in
     "deploy")
-        deploy "$2"
-        ;;
-    "rollback")
-        rollback "$2"
+        deploy
         ;;
     "status")
         show_status
-        ;;
-    "backup")
-        check_prerequisites
-        create_backup
-        ;;
-    "health")
-        run_standalone_health_checks "$2" "$3"
         ;;
     "-h"|"--help"|"help")
         show_help

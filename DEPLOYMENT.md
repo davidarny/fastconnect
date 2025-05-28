@@ -7,36 +7,99 @@ This guide provides comprehensive instructions for deploying the FastConnect lan
 - Ubuntu 20.04+ or Debian 10+ server
 - Root or sudo access
 - Domain name pointing to your server
-- Nginx and PHP 8.1+ installed
-- Git installed
 
-## 🚀 Quick Start
+## �� Quick Start
 
-1. **Copy files to server:**
+1. **Clone repository to server:**
 
    ```bash
-   scp -r . root@your-server:/root/fastconnect-deployment/
+   git clone https://github.com/your-username/fastconnect.git /var/www/fastconnect
+   cd /var/www/fastconnect
    ```
 
 2. **Run initial setup:**
+
    ```bash
-   cd /root/fastconnect-deployment/
-   ./generate-ssl.sh your-domain.com admin@your-domain.com
-   ./update-service.sh deploy
+   # Install dependencies
+   sudo ./install-dependencies.sh
+
+   # Generate SSL certificates
+   sudo ./generate-ssl.sh your-domain.com admin@your-domain.com
+
+   # Deploy the application
+   sudo ./update-service.sh deploy
    ```
 
 ## 📁 Files Overview
 
-| File                | Purpose                                   |
-| ------------------- | ----------------------------------------- |
-| `nginx.conf`        | Production-ready Nginx configuration      |
-| `generate-ssl.sh`   | SSL certificate generation and management |
-| `update-service.sh` | Service deployment and update automation  |
-| `revert-changes.sh` | Complete system rollback capabilities     |
+| File                      | Purpose                                    |
+| ------------------------- | ------------------------------------------ |
+| `install-dependencies.sh` | Install required dependencies (nginx, php) |
+| `update-service.sh`       | Service deployment from current directory  |
+| `nginx.conf`              | Production-ready Nginx configuration       |
+| `generate-ssl.sh`         | SSL certificate generation and management  |
+| `healthcheck.sh`          | Comprehensive health checks                |
+| `revert-changes.sh`       | Complete system rollback capabilities      |
 
 ## 🔧 Detailed Setup
 
-### 1. Nginx Configuration (`nginx.conf`)
+### 1. Dependencies Installation (`install-dependencies.sh`)
+
+**Features:**
+
+- Automatic installation of Nginx, PHP 8.1, and required extensions
+- Individual component installation
+- Installation status checking
+- Smart detection of already installed components
+
+**Usage:**
+
+```bash
+# Install all dependencies
+./install-dependencies.sh
+
+# Install specific components
+./install-dependencies.sh nginx
+./install-dependencies.sh php
+
+# Check installation status
+./install-dependencies.sh status
+
+# Help
+./install-dependencies.sh --help
+```
+
+### 2. Service Deployment (`update-service.sh`)
+
+**Features:**
+
+- Automated deployment from current directory
+- Service management (Nginx, PHP-FPM)
+- Nginx configuration management
+- Permission management
+- Deployment status reporting
+
+**Commands:**
+
+```bash
+# Deploy from current directory
+./update-service.sh deploy
+
+# Show deployment status
+./update-service.sh status
+
+# Help
+./update-service.sh --help
+```
+
+**Configuration:**
+
+```bash
+PROJECT_DIR="/var/www/fastconnect"
+NGINX_CONFIG="/etc/nginx/sites-available/fastconnect"
+```
+
+### 3. Nginx Configuration (`nginx.conf`)
 
 **Features:**
 
@@ -50,22 +113,9 @@ This guide provides comprehensive instructions for deploying the FastConnect lan
 - Log protection
 
 **Installation:**
+The deployment script automatically handles nginx configuration using your project's `nginx.conf` file.
 
-```bash
-# Copy to nginx sites-available
-cp nginx.conf /etc/nginx/sites-available/fastconnect
-
-# Enable the site
-ln -s /etc/nginx/sites-available/fastconnect /etc/nginx/sites-enabled/
-
-# Test configuration
-nginx -t
-
-# Reload nginx
-systemctl reload nginx
-```
-
-### 2. SSL Certificate Generation (`generate-ssl.sh`)
+### 4. SSL Certificate Generation (`generate-ssl.sh`)
 
 **Features:**
 
@@ -91,61 +141,34 @@ systemctl reload nginx
 ./generate-ssl.sh --help
 ```
 
-**Configuration:**
-Edit the script to change default values:
-
-```bash
-DOMAIN="fastconnectvpn.net"
-EMAIL="admin@fastconnectvpn.net"
-WEBROOT="/var/www/fastconnect"
-```
-
-### 3. Service Update Script (`update-service.sh`)
+### 5. Health Checks (`healthcheck.sh`)
 
 **Features:**
 
-- Automated deployment from Git or local files
-- Automatic backup before updates
-- Health checks and rollback on failure
-- Service management (Nginx, PHP-FPM)
-- Permission management
-- Deployment status reporting
+- System services monitoring (Nginx, PHP-FPM)
+- PHP environment validation
+- File system checks
+- Network connectivity tests
+- System resource monitoring
+- Application functionality verification
 
 **Commands:**
 
 ```bash
-# Deploy from Git (default)
-./update-service.sh deploy
+# Run health checks
+./healthcheck.sh
 
-# Deploy from local directory
-./update-service.sh deploy /path/to/local/files
+# Quiet mode (only exit codes)
+./healthcheck.sh --quiet
 
-# Rollback to previous version
-./update-service.sh rollback
+# JSON output
+./healthcheck.sh --format json
 
-# Rollback to specific backup
-./update-service.sh rollback /var/backups/fastconnect/20231201_143022
-
-# Show deployment status
-./update-service.sh status
-
-# Create backup only
-./update-service.sh backup
-
-# Run health checks only
-./update-service.sh health
+# Save to file
+./healthcheck.sh --output health-report.log
 ```
 
-**Configuration:**
-
-```bash
-PROJECT_DIR="/var/www/fastconnect"
-BACKUP_DIR="/var/backups/fastconnect"
-REPO_URL="https://github.com/your-username/fastconnect.git"
-BRANCH="main"
-```
-
-### 4. Revert Changes Script (`revert-changes.sh`)
+### 6. Revert Changes Script (`revert-changes.sh`)
 
 **Features:**
 
@@ -167,7 +190,6 @@ BRANCH="main"
 # Partial revert (specific components)
 ./revert-changes.sh partial ssl,nginx
 ./revert-changes.sh partial project
-./revert-changes.sh partial backups
 
 # Show revert status
 ./revert-changes.sh status
@@ -180,26 +202,27 @@ BRANCH="main"
 
 ### Initial Deployment
 
-1. **Prepare server:**
+1. **Clone repository to server:**
 
    ```bash
-   # Update system
-   apt update && apt upgrade -y
-
-   # Install required packages
-   apt install -y nginx php8.1-fpm php8.1-curl php8.1-mbstring php8.1-openssl php8.1-json git certbot python3-certbot-nginx
-   ```
-
-2. **Deploy scripts:**
-
-   ```bash
-   mkdir -p /root/fastconnect-deployment
-   cd /root/fastconnect-deployment
-   # Copy all files here
+   # Clone repository to the target directory
+   git clone https://github.com/your-username/fastconnect.git /var/www/fastconnect
+   cd /var/www/fastconnect
    chmod +x *.sh
    ```
 
-3. **Configure domain:**
+2. **Install dependencies:**
+
+   ```bash
+   # Install all required dependencies
+   sudo ./install-dependencies.sh
+
+   # Or install individually if needed
+   sudo ./install-dependencies.sh nginx
+   sudo ./install-dependencies.sh php
+   ```
+
+3. **Configure domain (if different from default):**
 
    ```bash
    # Edit scripts with your domain
@@ -210,25 +233,38 @@ BRANCH="main"
 4. **Generate SSL certificates:**
 
    ```bash
-   ./generate-ssl.sh yourdomain.com admin@yourdomain.com
+   sudo ./generate-ssl.sh yourdomain.com admin@yourdomain.com
    ```
 
 5. **Deploy application:**
+
    ```bash
-   ./update-service.sh deploy
+   sudo ./update-service.sh deploy
+   ```
+
+6. **Verify deployment:**
+   ```bash
+   ./healthcheck.sh
+   sudo ./update-service.sh status
    ```
 
 ### Regular Updates
 
 ```bash
-# Update from Git
-./update-service.sh deploy
+# Navigate to project directory
+cd /var/www/fastconnect
+
+# Pull latest changes
+git pull origin main
+
+# Deploy updates
+sudo ./update-service.sh deploy
 
 # Check status
-./update-service.sh status
+sudo ./update-service.sh status
 
-# If issues occur, rollback
-./update-service.sh rollback
+# Run health checks
+./healthcheck.sh
 ```
 
 ### Emergency Procedures
@@ -236,28 +272,28 @@ BRANCH="main"
 **If deployment fails:**
 
 ```bash
-# Rollback to last working version
-./update-service.sh rollback
-
 # Check what went wrong
-./update-service.sh health
+./healthcheck.sh
+
+# Use revert script for rollback
+sudo ./revert-changes.sh complete
 ```
 
 **If SSL issues occur:**
 
 ```bash
 # Regenerate certificates
-./generate-ssl.sh yourdomain.com admin@yourdomain.com
+sudo ./generate-ssl.sh yourdomain.com admin@yourdomain.com
 
 # Or revert SSL only
-./revert-changes.sh partial ssl
+sudo ./revert-changes.sh partial ssl
 ```
 
 **Complete system restoration:**
 
 ```bash
 # This will restore everything to pre-deployment state
-./revert-changes.sh complete
+sudo ./revert-changes.sh complete
 ```
 
 ## 📊 Monitoring and Logs
@@ -272,8 +308,14 @@ BRANCH="main"
 ### Health Checks
 
 ```bash
-# Manual health check
-./update-service.sh health
+# Comprehensive health check
+./healthcheck.sh
+
+# Check specific installation status
+./install-dependencies.sh status
+
+# Check deployment status
+sudo ./update-service.sh status
 
 # Check service status
 systemctl status nginx php8.1-fpm
@@ -290,7 +332,7 @@ certbot certificates
 ### File Permissions
 
 ```bash
-# Project files
+# Project files (handled automatically by deployment script)
 chown -R www-data:www-data /var/www/fastconnect
 chmod -R 755 /var/www/fastconnect
 chmod -R 644 /var/www/fastconnect/*.php
@@ -300,7 +342,7 @@ chmod 644 /etc/ssl/certs/fastconnect.crt
 chmod 600 /etc/ssl/private/fastconnect.key
 
 # Scripts
-chmod 700 /root/fastconnect-deployment/*.sh
+chmod 700 /var/www/fastconnect/*.sh
 ```
 
 ### Firewall Configuration
@@ -323,15 +365,25 @@ apt update && apt upgrade -y
 # Check SSL certificate renewal
 certbot renew --dry-run
 
-# Clean old backups (keep last 10)
-find /var/backups/fastconnect -type d -mtime +30 -exec rm -rf {} +
+# Run health checks
+./healthcheck.sh
 ```
 
 ## 🚨 Troubleshooting
 
 ### Common Issues
 
-**1. SSL Certificate Generation Fails**
+**1. Dependencies Not Installed**
+
+```bash
+# Check what's missing
+./install-dependencies.sh status
+
+# Install missing dependencies
+sudo ./install-dependencies.sh
+```
+
+**2. SSL Certificate Generation Fails**
 
 ```bash
 # Check domain DNS
@@ -344,7 +396,7 @@ curl -I http://yourdomain.com/.well-known/acme-challenge/test
 tail -f /var/log/letsencrypt/letsencrypt.log
 ```
 
-**2. Nginx Configuration Errors**
+**3. Nginx Configuration Errors**
 
 ```bash
 # Test configuration
@@ -357,7 +409,7 @@ nginx -T
 systemctl reload nginx
 ```
 
-**3. PHP-FPM Issues**
+**4. PHP-FPM Issues**
 
 ```bash
 # Check PHP-FPM status
@@ -370,54 +422,66 @@ tail -f /var/log/php8.1-fpm.log
 php -l /var/www/fastconnect/index.php
 ```
 
-**4. Permission Issues**
+**5. Permission Issues**
 
 ```bash
-# Fix ownership
-chown -R www-data:www-data /var/www/fastconnect
-
-# Fix permissions
-find /var/www/fastconnect -type d -exec chmod 755 {} \;
-find /var/www/fastconnect -type f -exec chmod 644 {} \;
+# Redeploy to fix permissions
+sudo ./update-service.sh deploy
 ```
 
 ### Recovery Procedures
 
-**1. Restore from Backup**
+**1. Use Health Checks for Diagnosis**
 
 ```bash
-# List available backups
-ls -la /var/backups/fastconnect/
+# Comprehensive system check
+./healthcheck.sh
 
-# Restore specific backup
-./update-service.sh rollback /var/backups/fastconnect/20231201_143022
+# Check installation status
+./install-dependencies.sh status
+
+# Check deployment status
+sudo ./update-service.sh status
 ```
 
 **2. Emergency SSL Recovery**
 
 ```bash
-# Use emergency backup
-cp /var/backups/fastconnect-emergency/*/letsencrypt /etc/ -r
-
-# Or regenerate
-./generate-ssl.sh yourdomain.com admin@yourdomain.com
+# Regenerate certificates
+sudo ./generate-ssl.sh yourdomain.com admin@yourdomain.com
 ```
 
 **3. Complete System Reset**
 
 ```bash
 # This will remove everything and restore defaults
-./revert-changes.sh complete remove-scripts
+sudo ./revert-changes.sh complete remove-scripts
 ```
 
 ## 📞 Support
 
 For issues or questions:
 
-1. Check the logs in `/var/log/nginx/` and `/var/www/fastconnect/logs/`
-2. Run health checks: `./update-service.sh health`
-3. Verify configuration: `nginx -t`
-4. Check service status: `systemctl status nginx php8.1-fpm`
+1. **Run diagnostics:**
+
+   ```bash
+   ./healthcheck.sh
+   ./install-dependencies.sh status
+   sudo ./update-service.sh status
+   ```
+
+2. **Check logs:**
+
+   ```bash
+   tail -f /var/log/nginx/fastconnect_error.log
+   tail -f /var/www/fastconnect/logs/requests_$(date +%Y-%m-%d).log
+   ```
+
+3. **Verify services:**
+   ```bash
+   systemctl status nginx php8.1-fpm
+   nginx -t
+   ```
 
 ## 🔄 Automation
 
@@ -429,11 +493,11 @@ The scripts automatically set up the following cron jobs:
 # SSL certificate renewal (every 12 hours)
 0 */12 * * * /usr/local/bin/renew-fastconnect-ssl.sh
 
-# Optional: Daily backup
-0 2 * * * /root/fastconnect-deployment/update-service.sh backup
+# Optional: Daily health check
+0 6 * * * /var/www/fastconnect/healthcheck.sh --quiet || echo "Health check failed" | mail -s "FastConnect Health Alert" admin@example.com
 
-# Optional: Weekly health check
-0 3 * * 0 /root/fastconnect-deployment/update-service.sh health
+# Optional: Weekly comprehensive report
+0 3 * * 0 /var/www/fastconnect/healthcheck.sh --format json --output /var/log/fastconnect-weekly-health.json
 ```
 
 ### CI/CD Integration
@@ -442,7 +506,34 @@ For automated deployments, you can integrate with CI/CD pipelines:
 
 ```bash
 # Example GitHub Actions deployment
-ssh root@your-server "cd /root/fastconnect-deployment && ./update-service.sh deploy"
+ssh root@your-server "cd /var/www/fastconnect && git pull origin main && sudo ./update-service.sh deploy"
+```
+
+## 📋 Script Reference
+
+### Installation Script Commands
+
+```bash
+./install-dependencies.sh install    # Install all dependencies
+./install-dependencies.sh nginx      # Install Nginx only
+./install-dependencies.sh php        # Install PHP only
+./install-dependencies.sh status     # Check installation status
+```
+
+### Deployment Script Commands
+
+```bash
+sudo ./update-service.sh deploy      # Deploy from current directory
+sudo ./update-service.sh status      # Show deployment status
+```
+
+### Health Check Commands
+
+```bash
+./healthcheck.sh                     # Run all health checks
+./healthcheck.sh --quiet             # Silent mode
+./healthcheck.sh --format json       # JSON output
+./healthcheck.sh --output file.log   # Save to file
 ```
 
 ---
@@ -450,7 +541,8 @@ ssh root@your-server "cd /root/fastconnect-deployment && ./update-service.sh dep
 **⚠️ Important Notes:**
 
 - Always test scripts in a staging environment first
+- Run health checks after any changes
 - Keep emergency contact information handy
-- Regularly backup your data
 - Monitor SSL certificate expiry dates
 - Keep scripts updated with latest security practices
+- The deployment script must be run from the FastConnect project directory

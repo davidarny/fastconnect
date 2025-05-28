@@ -8,12 +8,13 @@ A PHP-based landing page for FastConnect VPN with traffic cloaking, request logg
 - **Request Logging**: Comprehensive logging of all incoming requests and API responses
 - **File Downloads**: Secure VPN client download functionality
 - **SSL Support**: Automated SSL certificate generation and management
-- **Production Ready**: Complete deployment scripts with backup and rollback capabilities
+- **Production Ready**: Complete deployment scripts with automated installation and rollback capabilities
 - **Log Viewer**: Web-based log viewing interface with filtering and search
+- **Health Monitoring**: Comprehensive health checks and system monitoring
 
 ## 📋 Requirements
 
-- **PHP**: 7.2 or higher
+- **PHP**: 8.1 or higher
 - **PHP Extensions**:
   - cURL
   - mbstring
@@ -26,54 +27,63 @@ A PHP-based landing page for FastConnect VPN with traffic cloaking, request logg
 
 ## 🛠️ Installation
 
-### Quick Setup
+### Quick Production Setup
 
-1. **Clone or download the project:**
+1. **Clone repository to your server:**
 
    ```bash
-   git clone <repository-url> fastconnect
-   cd fastconnect
+   git clone https://github.com/your-username/fastconnect.git /var/www/fastconnect
+   cd /var/www/fastconnect
    ```
 
-2. **For production deployment:**
+2. **Run setup:**
 
    ```bash
-   # Copy files to your server
-   scp -r . root@your-server:/root/fastconnect-deployment/
+   # Install dependencies
+   sudo ./install-dependencies.sh
 
-   # SSH to your server and run setup
-   ssh root@your-server
-   cd /root/fastconnect-deployment/
-   ./generate-ssl.sh your-domain.com admin@your-domain.com
-   ./update-service.sh deploy
+   # Generate SSL certificates
+   sudo ./generate-ssl.sh your-domain.com admin@your-domain.com
+
+   # Deploy the application
+   sudo ./update-service.sh deploy
    ```
 
 ### Manual Setup
 
-1. **Configure your web server** to point to the project directory
-2. **Set proper permissions:**
+1. **Install dependencies manually:**
+
+   ```bash
+   # Ubuntu/Debian
+   apt update
+   apt install -y nginx php8.1-fpm php8.1-curl php8.1-mbstring php8.1-openssl php8.1-json
+   ```
+
+2. **Configure your web server** to point to the project directory
+
+3. **Set proper permissions:**
    ```bash
    chmod 755 index.php download.php logs.php
    chmod 755 logs/
    ```
-3. **Ensure PHP extensions are installed**
-4. **Configure SSL** (recommended for production)
 
 ## 📁 Project Structure
 
 ```
 fastconnect/
-├── index.php              # Main landing page with cloaking logic
-├── download.php            # VPN client download handler
-├── logs.php               # Web-based log viewer
-├── nginx.conf             # Production Nginx configuration
-├── generate-ssl.sh        # SSL certificate automation
-├── update-service.sh      # Deployment and update automation
-├── revert-changes.sh      # System rollback capabilities
-├── DEPLOYMENT.md          # Detailed deployment guide
-├── logs/                  # Request and API response logs
-├── favicon/               # Favicon files
-└── FastConnect_VPN.zip    # VPN client download file
+├── index.php                 # Main landing page with cloaking logic
+├── download.php              # VPN client download handler
+├── logs.php                  # Web-based log viewer
+├── install-dependencies.sh   # Dependencies installation script
+├── update-service.sh         # Deployment automation script
+├── nginx.conf                # Production Nginx configuration
+├── generate-ssl.sh           # SSL certificate automation
+├── healthcheck.sh            # Comprehensive health checks
+├── revert-changes.sh         # System rollback capabilities
+├── DEPLOYMENT.md             # Detailed deployment guide
+├── logs/                     # Request and API response logs
+├── favicon/                  # Favicon files
+└── FastConnect_VPN.zip       # VPN client download file
 ```
 
 ## 🔧 Configuration
@@ -113,9 +123,7 @@ WEBROOT="/var/www/fastconnect"
 
 ```bash
 PROJECT_DIR="/var/www/fastconnect"
-BACKUP_DIR="/var/backups/fastconnect"
-REPO_URL="https://github.com/your-username/fastconnect.git"
-BRANCH="main"
+NGINX_CONFIG="/etc/nginx/sites-available/fastconnect"
 ```
 
 ## 📊 Logging
@@ -163,18 +171,24 @@ See [DEPLOYMENT.md](DEPLOYMENT.md) for comprehensive deployment instructions.
 **Quick commands:**
 
 ```bash
-# Initial deployment
-./generate-ssl.sh your-domain.com admin@your-domain.com
-./update-service.sh deploy
+# Clone repository
+git clone https://github.com/your-username/fastconnect.git /var/www/fastconnect
+cd /var/www/fastconnect
 
-# Update deployment
-./update-service.sh deploy
+# Install dependencies
+sudo ./install-dependencies.sh
 
-# Rollback if needed
-./update-service.sh rollback
+# Generate SSL certificates
+sudo ./generate-ssl.sh your-domain.com admin@your-domain.com
 
-# Check status
-./update-service.sh status
+# Deploy application
+sudo ./update-service.sh deploy
+
+# Check deployment status
+sudo ./update-service.sh status
+
+# Run health checks
+./healthcheck.sh
 ```
 
 ### Development Setup
@@ -194,7 +208,7 @@ See [DEPLOYMENT.md](DEPLOYMENT.md) for comprehensive deployment instructions.
 
 ### Health Checks
 
-The system provides comprehensive health checking capabilities through multiple interfaces:
+The system provides comprehensive health checking capabilities:
 
 #### Comprehensive Health Check Script
 
@@ -223,19 +237,22 @@ The system provides comprehensive health checking capabilities through multiple 
 - System resources (disk, memory, CPU load)
 - Application functionality and syntax checks
 
-#### Deployment Script Integration
+#### Installation Status Check
 
-The deployment script includes health checks:
+Check what dependencies are installed:
 
 ```bash
-# Run health checks only
-./update-service.sh health
+# Check installation status
+./install-dependencies.sh status
+```
 
-# Health checks with JSON output
-./update-service.sh health json
+#### Deployment Status Check
 
-# Save health check results to file
-./update-service.sh health text health-report.log
+Check deployment status:
+
+```bash
+# Show deployment status
+sudo ./update-service.sh status
 ```
 
 #### Exit Codes
@@ -268,72 +285,80 @@ tail -f logs/requests_$(date +%Y-%m-%d).log
 tail -f logs/api_responses_$(date +%Y-%m-%d).log
 ```
 
-### System Status
-
-Check deployment status:
-
-```bash
-./update-service.sh status
-```
-
 ## 🔄 Maintenance
 
-### Backup
+### Dependencies Management
 
 ```bash
-# Create manual backup
-./update-service.sh backup
+# Check what's installed
+./install-dependencies.sh status
 
-# Backups are stored in /var/backups/fastconnect/
+# Install missing dependencies
+sudo ./install-dependencies.sh
 ```
 
 ### Updates
 
 ```bash
-# Deploy latest changes
-./update-service.sh deploy
+# Navigate to project directory
+cd /var/www/fastconnect
 
-# Deploy from specific directory
-./update-service.sh deploy /path/to/local/files
+# Pull latest changes
+git pull origin main
+
+# Deploy updates
+sudo ./update-service.sh deploy
+```
+
+### Health Monitoring
+
+```bash
+# Run comprehensive health check
+./healthcheck.sh
+
+# Check specific components
+./install-dependencies.sh status
+sudo ./update-service.sh status
 ```
 
 ### Rollback
 
 ```bash
-# Rollback to previous version
-./update-service.sh rollback
-
-# Rollback to specific backup
-./update-service.sh rollback /var/backups/fastconnect/20231201_143022
-
 # Complete system revert
-./revert-changes.sh complete
+sudo ./revert-changes.sh complete
+
+# Partial revert (specific components)
+sudo ./revert-changes.sh partial ssl
+sudo ./revert-changes.sh partial nginx
+sudo ./revert-changes.sh partial project
 ```
 
 ## 🐛 Troubleshooting
 
 ### Common Issues
 
-1. **PHP Extensions Missing:**
+1. **Dependencies Missing:**
 
    ```bash
-   # Ubuntu/Debian
-   sudo apt install php8.1-curl php8.1-mbstring php8.1-openssl php8.1-json
+   # Check what's missing
+   ./install-dependencies.sh status
+
+   # Install missing dependencies
+   sudo ./install-dependencies.sh
    ```
 
 2. **Permission Issues:**
 
    ```bash
-   chmod 755 *.php
-   chmod 755 logs/
-   chown -R www-data:www-data logs/
+   # Redeploy to fix permissions
+   sudo ./update-service.sh deploy
    ```
 
 3. **SSL Certificate Issues:**
 
    ```bash
    # Regenerate SSL certificate
-   ./generate-ssl.sh your-domain.com admin@your-domain.com
+   sudo ./generate-ssl.sh your-domain.com admin@your-domain.com
    ```
 
 4. **Nginx Configuration:**
@@ -345,6 +370,35 @@ Check deployment status:
    # Reload configuration
    systemctl reload nginx
    ```
+
+5. **Service Issues:**
+
+   ```bash
+   # Check service status
+   systemctl status nginx php8.1-fpm
+
+   # Restart services
+   systemctl restart nginx php8.1-fpm
+   ```
+
+### Diagnostic Tools
+
+Use the built-in diagnostic tools:
+
+```bash
+# Comprehensive system check
+./healthcheck.sh
+
+# Check installation status
+./install-dependencies.sh status
+
+# Check deployment status
+sudo ./update-service.sh status
+
+# Check logs
+tail -f /var/log/nginx/error.log
+tail -f logs/requests_$(date +%Y-%m-%d).log
+```
 
 ### Log Analysis
 
@@ -359,6 +413,49 @@ tail -f logs/requests_$(date +%Y-%m-%d).log | jq .
 
 # API response logs
 tail -f logs/api_responses_$(date +%Y-%m-%d).log | jq .
+```
+
+## 📋 Script Reference
+
+### Installation Script
+
+```bash
+./install-dependencies.sh install    # Install all dependencies
+./install-dependencies.sh nginx      # Install Nginx only
+./install-dependencies.sh php        # Install PHP only
+./install-dependencies.sh status     # Check installation status
+```
+
+### Deployment Script
+
+```bash
+sudo ./update-service.sh deploy      # Deploy from current directory
+sudo ./update-service.sh status      # Show deployment status
+```
+
+### Health Check Script
+
+```bash
+./healthcheck.sh                     # Run all health checks
+./healthcheck.sh --quiet             # Silent mode
+./healthcheck.sh --format json       # JSON output
+./healthcheck.sh --output file.log   # Save to file
+```
+
+### SSL Management
+
+```bash
+./generate-ssl.sh                    # Generate with default domain
+./generate-ssl.sh domain.com         # Generate for specific domain
+./generate-ssl.sh domain.com email   # Generate with custom email
+```
+
+### System Recovery
+
+```bash
+sudo ./revert-changes.sh complete    # Complete system revert
+sudo ./revert-changes.sh partial ssl # Revert SSL only
+sudo ./revert-changes.sh status      # Show revert status
 ```
 
 ## 📝 License
