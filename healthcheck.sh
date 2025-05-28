@@ -7,7 +7,7 @@
 set -e
 
 # Configuration
-PROJECT_DIR="/var/www/fastconnect-landing"
+PROJECT_DIR="/var/www/fastconnect"
 LOG_DIR="$PROJECT_DIR/logs"
 DOWNLOAD_FILE="$PROJECT_DIR/FastConnect_VPN.zip"
 CLOAKING_API="https://cloakit.house/api/v1/check"

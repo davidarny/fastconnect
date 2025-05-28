@@ -6,9 +6,9 @@
 set -e
 
 # Configuration
-PROJECT_DIR="/var/www/fastconnect-landing"
+PROJECT_DIR="/var/www/fastconnect"
 BACKUP_DIR="/var/backups/fastconnect"
-REPO_URL="https://github.com/your-username/fastconnect-landing.git"
+REPO_URL="https://github.com/davidarny/fastconnect.git"
 BRANCH="main"
 SERVICE_NAME="fastconnect"
 NGINX_CONFIG="/etc/nginx/sites-available/fastconnect"

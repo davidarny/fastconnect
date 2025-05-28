@@ -106,15 +106,15 @@ Edit variables in the deployment scripts:
 ```bash
 DOMAIN="fastconnectvpn.net"
 EMAIL="admin@fastconnectvpn.net"
-WEBROOT="/var/www/fastconnect-landing"
+WEBROOT="/var/www/fastconnect"
 ```
 
 **`update-service.sh`:**
 
 ```bash
-PROJECT_DIR="/var/www/fastconnect-landing"
+PROJECT_DIR="/var/www/fastconnect"
 BACKUP_DIR="/var/backups/fastconnect"
-REPO_URL="https://github.com/your-username/fastconnect-landing.git"
+REPO_URL="https://github.com/your-username/fastconnect.git"
 BRANCH="main"
 ```
 
@@ -250,10 +250,10 @@ Add to crontab for automated monitoring:
 
 ```bash
 # Daily health check with email notification
-0 6 * * * /var/www/fastconnect-landing/healthcheck.sh --quiet || echo "Health check failed" | mail -s "FastConnect Health Alert" admin@example.com
+0 6 * * * /var/www/fastconnect/healthcheck.sh --quiet || echo "Health check failed" | mail -s "FastConnect Health Alert" admin@example.com
 
 # Weekly comprehensive report
-0 3 * * 0 /var/www/fastconnect-landing/healthcheck.sh --format json --output /var/log/fastconnect-weekly-health.json
+0 3 * * 0 /var/www/fastconnect/healthcheck.sh --format json --output /var/log/fastconnect-weekly-health.json
 ```
 
 ### Log Monitoring

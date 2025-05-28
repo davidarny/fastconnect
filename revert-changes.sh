@@ -6,7 +6,7 @@
 set -e
 
 # Configuration
-PROJECT_DIR="/var/www/fastconnect-landing"
+PROJECT_DIR="/var/www/fastconnect"
 BACKUP_DIR="/var/backups/fastconnect"
 NGINX_CONFIG="/etc/nginx/sites-available/fastconnect"
 NGINX_TEMP_CONFIG="/etc/nginx/sites-available/fastconnect-temp"

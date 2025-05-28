@@ -8,7 +8,7 @@ set -e
 # Configuration
 DOMAIN="fastconnectvpn.net"
 EMAIL="admin@fastconnectvpn.net"
-WEBROOT="/var/www/fastconnect-landing"
+WEBROOT="/var/www/fastconnect"
 NGINX_CONFIG="/etc/nginx/sites-available/fastconnect"
 SSL_DIR="/etc/ssl"
 

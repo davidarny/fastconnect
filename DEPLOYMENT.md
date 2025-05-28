@@ -97,7 +97,7 @@ Edit the script to change default values:
 ```bash
 DOMAIN="fastconnectvpn.net"
 EMAIL="admin@fastconnectvpn.net"
-WEBROOT="/var/www/fastconnect-landing"
+WEBROOT="/var/www/fastconnect"
 ```
 
 ### 3. Service Update Script (`update-service.sh`)
@@ -139,9 +139,9 @@ WEBROOT="/var/www/fastconnect-landing"
 **Configuration:**
 
 ```bash
-PROJECT_DIR="/var/www/fastconnect-landing"
+PROJECT_DIR="/var/www/fastconnect"
 BACKUP_DIR="/var/backups/fastconnect"
-REPO_URL="https://github.com/your-username/fastconnect-landing.git"
+REPO_URL="https://github.com/your-username/fastconnect.git"
 BRANCH="main"
 ```
 
@@ -266,7 +266,7 @@ BRANCH="main"
 
 - **Nginx Access:** `/var/log/nginx/fastconnect_access.log`
 - **Nginx Error:** `/var/log/nginx/fastconnect_error.log`
-- **Application Logs:** `/var/www/fastconnect-landing/logs/`
+- **Application Logs:** `/var/www/fastconnect/logs/`
 - **SSL Renewal:** `/var/log/letsencrypt/`
 
 ### Health Checks
@@ -291,9 +291,9 @@ certbot certificates
 
 ```bash
 # Project files
-chown -R www-data:www-data /var/www/fastconnect-landing
-chmod -R 755 /var/www/fastconnect-landing
-chmod -R 644 /var/www/fastconnect-landing/*.php
+chown -R www-data:www-data /var/www/fastconnect
+chmod -R 755 /var/www/fastconnect
+chmod -R 644 /var/www/fastconnect/*.php
 
 # SSL certificates
 chmod 644 /etc/ssl/certs/fastconnect.crt
@@ -367,18 +367,18 @@ systemctl status php8.1-fpm
 tail -f /var/log/php8.1-fpm.log
 
 # Test PHP syntax
-php -l /var/www/fastconnect-landing/index.php
+php -l /var/www/fastconnect/index.php
 ```
 
 **4. Permission Issues**
 
 ```bash
 # Fix ownership
-chown -R www-data:www-data /var/www/fastconnect-landing
+chown -R www-data:www-data /var/www/fastconnect
 
 # Fix permissions
-find /var/www/fastconnect-landing -type d -exec chmod 755 {} \;
-find /var/www/fastconnect-landing -type f -exec chmod 644 {} \;
+find /var/www/fastconnect -type d -exec chmod 755 {} \;
+find /var/www/fastconnect -type f -exec chmod 644 {} \;
 ```
 
 ### Recovery Procedures
@@ -414,7 +414,7 @@ cp /var/backups/fastconnect-emergency/*/letsencrypt /etc/ -r
 
 For issues or questions:
 
-1. Check the logs in `/var/log/nginx/` and `/var/www/fastconnect-landing/logs/`
+1. Check the logs in `/var/log/nginx/` and `/var/www/fastconnect/logs/`
 2. Run health checks: `./update-service.sh health`
 3. Verify configuration: `nginx -t`
 4. Check service status: `systemctl status nginx php8.1-fpm`
