@@ -16,12 +16,11 @@ NC='\033[0m' # No Color
 REMOTE_USER="root"
 REMOTE_HOST="69.62.70.193"
 REMOTE_PATH="/var/www/fastconnect/"
-LOCAL_DIR="./"
 
 # Function to display usage
 show_usage() {
     echo -e "${BLUE}Usage:${NC}"
-    echo "  $0 <filename>         # Upload specific file from $LOCAL_DIR"
+    echo "  $0 <filename>         # Upload specific file"
     echo "  $0 --list            # List available files"
     echo "  $0 --help            # Show this help message"
     echo
@@ -34,8 +33,8 @@ show_usage() {
 # Function to check if file exists
 check_file_exists() {
     local file="$1"
-    if [ ! -f "$LOCAL_DIR/$file" ]; then
-        echo -e "${RED}Error: File '$file' not found in $LOCAL_DIR${NC}"
+    if [ ! -f "$file" ]; then
+        echo -e "${RED}Error: File '$file' not found${NC}"
         return 1
     fi
     return 0
@@ -44,7 +43,7 @@ check_file_exists() {
 # Function to upload a single file
 upload_file() {
     local filename="$1"
-    local local_path="$LOCAL_DIR/$filename"
+    local local_path="$filename"
     
     echo -e "${YELLOW}Uploading $filename...${NC}"
     
@@ -69,9 +68,9 @@ upload_file() {
 
 # Function to list available files
 list_files() {
-    echo -e "${BLUE}Available files in $LOCAL_DIR:${NC}"
-    if ls "$LOCAL_DIR"/* 1> /dev/null 2>&1; then
-        for file in "$LOCAL_DIR"/*; do
+    echo -e "${BLUE}Available files:${NC}"
+    if ls ./* 1> /dev/null 2>&1; then
+        for file in ./*; do
             if [ -f "$file" ]; then
                 local filename=$(basename "$file")
                 local file_size=$(ls -lh "$file" | awk '{print $5}')
@@ -79,7 +78,7 @@ list_files() {
             fi
         done
     else
-        echo -e "${YELLOW}No files found in $LOCAL_DIR${NC}"
+        echo -e "${YELLOW}No files found${NC}"
     fi
 }
 
@@ -90,12 +89,6 @@ main() {
     echo -e "${GREEN}File Upload Script${NC}"
     echo -e "${BLUE}Remote destination: $REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH${NC}"
     echo
-
-    # Check if local directory exists
-    if [ ! -d "$LOCAL_DIR" ]; then
-        echo -e "${RED}Error: Local directory '$LOCAL_DIR' does not exist${NC}"
-        exit 1
-    fi
 
     # Parse command line arguments
     case "${1:-}" in

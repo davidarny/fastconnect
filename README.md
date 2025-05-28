@@ -1,471 +1,391 @@
 # FastConnect VPN Landing Page
 
-A PHP-based landing page for FastConnect VPN with traffic cloaking, request logging, and automated deployment capabilities.
+A modern, responsive landing page for FastConnect VPN with advanced privacy features, dynamic location switching, and AI-powered security. Built with PHP, featuring a sleek design with Tailwind CSS and Alpine.js.
 
 ## 🚀 Features
 
-- **Traffic Cloaking**: Intelligent traffic filtering using CloakIt API
-- **Request Logging**: Comprehensive logging of all incoming requests and API responses
-- **File Downloads**: Secure VPN client download functionality
-- **SSL Support**: Automated SSL certificate generation and management
-- **Production Ready**: Complete deployment scripts with automated installation and rollback capabilities
-- **Log Viewer**: Web-based log viewing interface with filtering and search
-- **Health Monitoring**: Comprehensive health checks and system monitoring
+- **Modern Design**: Clean, responsive interface built with Tailwind CSS
+- **Dynamic Content**: Interactive elements powered by Alpine.js
+- **Cloaking System**: Integrated with cloaking API for traffic filtering
+- **Comprehensive Logging**: Request tracking and API response logging
+- **SSL Ready**: Automatic SSL certificate setup with Let's Encrypt
+- **Security Headers**: Comprehensive security configuration
+- **Performance Optimized**: Gzip compression, caching, and optimized assets
 
 ## 📋 Requirements
 
-- **PHP**: 8.1 or higher
-- **PHP Extensions**:
-  - cURL
-  - mbstring
-  - OpenSSL
-  - JSON
-  - Filter
-- **Server**: Nginx (recommended) or Apache
-- **OS**: Ubuntu 20.04+ or Debian 10+ (for deployment scripts)
-- **SSL**: Let's Encrypt (automated via included scripts)
+- Ubuntu 18.04+ (recommended: Ubuntu 22.04 LTS)
+- Root access to the server
+- Domain name pointing to your server
+- Email address for SSL certificates
 
-## 🛠️ Installation
+## 🛠 Quick Deployment
 
-### Quick Production Setup
+### Automated Deployment (Recommended)
 
-1. **Clone repository to your server:**
+1. **Clone the repository** on your local machine:
 
    ```bash
-   git clone https://github.com/your-username/fastconnect.git /var/www/fastconnect
-   cd /var/www/fastconnect
+   git clone <repository-url>
+   cd fastconnect
    ```
 
-2. **Run setup:**
+2. **Upload to server** using the provided upload script:
 
    ```bash
-   # Install dependencies
-   sudo ./install-dependencies.sh
+   # Upload the deployment script first
+   ./upload.sh deploy.sh
 
-   # Generate SSL certificates
-   sudo ./generate-ssl.sh your-domain.com admin@your-domain.com
-
-   # Deploy the application
-   sudo ./update-service.sh deploy
+   # Upload all project files
+   rsync -av --exclude='.git' --exclude='logs' --exclude='.DS_Store' ./ root@69.62.70.193:/root/fastconnect/
    ```
 
-### Manual Setup
-
-1. **Install dependencies manually:**
+3. **SSH to your server**:
 
    ```bash
-   # Ubuntu/Debian
+   ssh root@69.62.70.193
+   cd /root/fastconnect
+   ```
+
+4. **Run the deployment script**:
+
+   ```bash
+   # Basic deployment with default domain
+   ./deploy.sh
+
+   # Or specify custom domain and email
+   ./deploy.sh yourdomain.com admin@yourdomain.com
+   ```
+
+The script will automatically:
+
+- Update the system and install dependencies
+- Install and configure PHP 8.3-FPM
+- Install and configure Nginx
+- Deploy project files
+- Setup SSL certificates with Let's Encrypt
+- Configure firewall rules
+- Setup log rotation
+- Run comprehensive health checks
+
+### Manual Deployment
+
+If you prefer manual deployment, follow these steps:
+
+<details>
+<summary>Click to expand manual deployment steps</summary>
+
+1. **Update system packages**:
+
+   ```bash
+   apt update && apt upgrade -y
+   apt install -y curl wget unzip software-properties-common
+   ```
+
+2. **Install PHP 8.3**:
+
+   ```bash
+   add-apt-repository ppa:ondrej/php -y
    apt update
-   apt install -y nginx php8.3-fpm php8.3-curl php8.3-mbstring php8.3-openssl php8.3-json
+   apt install -y php8.3 php8.3-fpm php8.3-cli php8.3-common php8.3-curl php8.3-mbstring php8.3-xml php8.3-zip php8.3-json php8.3-opcache
    ```
 
-2. **Configure your web server** to point to the project directory
+3. **Install Nginx**:
 
-3. **Set proper permissions:**
    ```bash
-   chmod 755 index.php download.php logs.php
-   chmod 755 logs/
+   apt install -y nginx
+   systemctl enable nginx
+   systemctl start nginx
    ```
+
+4. **Install Certbot**:
+
+   ```bash
+   apt install -y certbot python3-certbot-nginx
+   ```
+
+5. **Deploy project files**:
+
+   ```bash
+   mkdir -p /var/www/fastconnect
+   # Copy your project files to /var/www/fastconnect
+   chown -R www-data:www-data /var/www/fastconnect
+   ```
+
+6. **Configure Nginx** (use the provided nginx.conf as reference)
+
+7. **Setup SSL certificates**:
+   ```bash
+   certbot --nginx -d yourdomain.com -d www.yourdomain.com
+   ```
+
+</details>
 
 ## 📁 Project Structure
 
 ```
 fastconnect/
-├── index.php                 # Main landing page with cloaking logic
-├── download.php              # VPN client download handler
-├── logs.php                  # Web-based log viewer
-├── install-dependencies.sh   # Dependencies installation script
-├── update-service.sh         # Deployment automation script
-├── nginx.conf                # Production Nginx configuration
-├── generate-ssl.sh           # SSL certificate automation
-├── healthcheck.sh            # Comprehensive health checks
-├── revert-changes.sh         # System rollback capabilities
-├── DEPLOYMENT.md             # Detailed deployment guide
-├── logs/                     # Request and API response logs
-├── favicon/                  # Favicon files
-└── FastConnect_VPN.zip       # VPN client download file
+├── index.php              # Main landing page
+├── download.php            # File download handler
+├── logs.php               # Log viewer (protected)
+├── upload.sh              # File upload utility
+├── deploy.sh              # Automated deployment script
+├── nginx.conf             # Nginx configuration template
+├── favicon.ico            # Website favicon
+├── favicon/               # Favicon variants
+│   ├── apple-touch-icon.png
+│   ├── favicon-16x16.png
+│   ├── favicon-32x32.png
+│   └── site.webmanifest
+├── logs/                  # Application logs (auto-created)
+│   ├── requests_YYYY-MM-DD.log
+│   └── api_responses_YYYY-MM-DD.log
+├── FastConnect_VPN.zip    # VPN application download
+└── README.md              # This file
 ```
 
 ## 🔧 Configuration
 
-### Main Configuration
+### Environment Variables
 
-Edit the domain in `index.php`:
+The application uses the following configuration in `index.php`:
 
 ```php
-$domain = 'https://fastconnectvpn.net';
+$domain = 'https://fastconnectvpn.net';  // Your domain
 ```
 
-### Cloaking Configuration
+### Cloaking API
 
-The system uses CloakIt API for traffic filtering. Configure the label in `index.php`:
+The application integrates with a cloaking service. Configure the API endpoint and label in `index.php`:
 
 ```php
 $request_data = [
-    'label' => '7e4751d376339c9ba38f57829ccefe9a', // Your CloakIt label
+    'label' => '7e4751d376339c9ba38f57829ccefe9a',  // Your cloaking label
     // ... other parameters
 ];
 ```
 
-### Deployment Scripts Configuration
+### Nginx Configuration
 
-Edit variables in the deployment scripts:
+The deployment script automatically configures Nginx with:
 
-**`generate-ssl.sh`:**
+- SSL/TLS encryption (TLS 1.2/1.3)
+- Security headers
+- Gzip compression
+- Static file caching
+- PHP-FPM integration
+- Log protection
 
-```bash
-DOMAIN="fastconnectvpn.net"
-EMAIL="admin@fastconnectvpn.net"
-WEBROOT="/var/www/fastconnect"
-```
+## 📊 Monitoring & Logs
 
-**`update-service.sh`:**
+### Log Files
 
-```bash
-PROJECT_DIR="/var/www/fastconnect"
-NGINX_CONFIG="/etc/nginx/sites-available/fastconnect"
-```
+The application generates several types of logs:
 
-## 📊 Logging
+1. **Request Logs** (`logs/requests_YYYY-MM-DD.log`):
 
-The system provides comprehensive logging capabilities:
+   - User IP addresses
+   - User agents
+   - Referrers
+   - Request timestamps
+   - Browser languages
 
-### Request Logs
+2. **API Response Logs** (`logs/api_responses_YYYY-MM-DD.log`):
 
-- **Location**: `logs/requests_YYYY-MM-DD.log`
-- **Content**: IP address, user agent, referer, request details, browser language
-- **Format**: JSON (one entry per line)
+   - Cloaking API responses
+   - Response times
+   - HTTP status codes
+   - Error messages
 
-### API Response Logs
-
-- **Location**: `logs/api_responses_YYYY-MM-DD.log`
-- **Content**: CloakIt API responses, response times, HTTP codes
-- **Format**: JSON (one entry per line)
+3. **System Logs**:
+   - Nginx access: `/var/log/nginx/fastconnect_access.log`
+   - Nginx errors: `/var/log/nginx/fastconnect_error.log`
+   - Deployment: `/var/log/fastconnect-deploy.log`
 
 ### Log Viewer
 
-Access the web-based log viewer at `/logs.php`:
+Access the web-based log viewer at:
 
-- **Security**: IP-based access control (configure in `logs.php`)
-- **Features**: Date filtering, log type selection, JSON formatting
-- **URL Parameters**:
-  - `?type=requests` or `?type=api_responses`
-  - `?date=YYYY-MM-DD`
-  - `?allow=1` (bypass IP restrictions)
-
-## 🔒 Security Features
-
-- **IP-based access control** for log viewer
-- **SSL/TLS encryption** with modern cipher suites
-- **Security headers** (HSTS, CSP, X-Frame-Options)
-- **Rate limiting** via Nginx configuration
-- **Input validation** and sanitization
-- **Secure file downloads** with proper headers
-
-## 🚀 Deployment
-
-### Production Deployment
-
-See [DEPLOYMENT.md](DEPLOYMENT.md) for comprehensive deployment instructions.
-
-**Quick commands:**
-
-```bash
-# Clone repository
-git clone https://github.com/your-username/fastconnect.git /var/www/fastconnect
-cd /var/www/fastconnect
-
-# Install dependencies
-sudo ./install-dependencies.sh
-
-# Generate SSL certificates
-sudo ./generate-ssl.sh your-domain.com admin@your-domain.com
-
-# Deploy application
-sudo ./update-service.sh deploy
-
-# Check deployment status
-sudo ./update-service.sh status
-
-# Run health checks
-./healthcheck.sh
+```
+https://yourdomain.com/logs.php?allow=1
 ```
 
-### Development Setup
-
-1. **Local PHP server:**
-
-   ```bash
-   php -S localhost:8000
-   ```
-
-2. **With Docker:**
-   ```bash
-   docker run -p 8000:80 -v $(pwd):/var/www/html php:8.1-apache
-   ```
-
-## 📈 Monitoring
+**Note**: The log viewer is IP-restricted for security. Add your IP to the allowed list in `logs.php` or use the `?allow=1` parameter.
 
 ### Health Checks
 
-The system provides comprehensive health checking capabilities:
-
-#### Comprehensive Health Check Script
-
-**`healthcheck.sh`** - Standalone bash script for system-level health checks:
+Run health checks manually:
 
 ```bash
-# Basic health check
-./healthcheck.sh
+# Check service status
+systemctl status nginx
+systemctl status php8.3-fpm
 
-# Quiet mode (only exit code)
-./healthcheck.sh --quiet
+# Check website accessibility
+curl -I http://yourdomain.com
+curl -I https://yourdomain.com
 
-# JSON output
-./healthcheck.sh --format json
-
-# Save output to file
-./healthcheck.sh --output health-report.log
+# View recent logs
+tail -f /var/log/nginx/fastconnect_error.log
+tail -f /var/www/fastconnect/logs/requests_$(date +%Y-%m-%d).log
 ```
 
-**Features:**
+## 🔒 Security Features
 
-- System services (Nginx, PHP-FPM)
-- PHP environment and extensions
-- File system permissions and required files
-- Network connectivity and API endpoints
-- System resources (disk, memory, CPU load)
-- Application functionality and syntax checks
+### Built-in Security
 
-#### Installation Status Check
+- **SSL/TLS Encryption**: Automatic HTTPS with Let's Encrypt
+- **Security Headers**: HSTS, CSP, X-Frame-Options, etc.
+- **Log Protection**: Nginx blocks access to log files
+- **Hidden Files Protection**: Blocks access to dotfiles
+- **Input Validation**: PHP filters and validation
+- **Firewall Configuration**: UFW rules for HTTP/HTTPS/SSH
 
-Check what dependencies are installed:
+### IP Restrictions
 
-```bash
-# Check installation status
-./install-dependencies.sh status
-```
+The log viewer includes IP restrictions. To add your IP:
 
-#### Deployment Status Check
+1. Edit `logs.php`
+2. Add your IP to the `$allowed_ips` array:
+   ```php
+   $allowed_ips = ['127.0.0.1', '::1', 'YOUR.IP.ADDRESS.HERE'];
+   ```
 
-Check deployment status:
+## 🚀 Performance Optimization
 
-```bash
-# Show deployment status
-sudo ./update-service.sh status
-```
+### Caching
 
-#### Exit Codes
+- **Static Files**: 1-year cache for images, CSS, JS
+- **Gzip Compression**: Enabled for text-based files
+- **PHP OPcache**: Enabled for improved PHP performance
 
-- **0**: All checks passed (healthy)
-- **1**: Some checks failed with warnings
-- **2**: Critical checks failed (unhealthy)
+### CDN Integration
 
-#### Monitoring Integration
+The application loads external resources from CDNs:
 
-Add to crontab for automated monitoring:
-
-```bash
-# Daily health check with email notification
-0 6 * * * /var/www/fastconnect/healthcheck.sh --quiet || echo "Health check failed" | mail -s "FastConnect Health Alert" admin@example.com
-
-# Weekly comprehensive report
-0 3 * * 0 /var/www/fastconnect/healthcheck.sh --format json --output /var/log/fastconnect-weekly-health.json
-```
-
-### Log Monitoring
-
-Monitor logs in real-time:
-
-```bash
-# Request logs
-tail -f logs/requests_$(date +%Y-%m-%d).log
-
-# API response logs
-tail -f logs/api_responses_$(date +%Y-%m-%d).log
-```
+- Tailwind CSS
+- Alpine.js
+- Lucide Icons
+- Google Fonts (Geist)
 
 ## 🔄 Maintenance
 
-### Dependencies Management
+### SSL Certificate Renewal
+
+Certificates are automatically renewed via cron job:
 
 ```bash
-# Check what's installed
-./install-dependencies.sh status
+# View current cron jobs
+crontab -l
 
-# Install missing dependencies
-sudo ./install-dependencies.sh
+# Manual renewal
+certbot renew --nginx
 ```
+
+### Log Rotation
+
+Logs are automatically rotated daily and compressed:
+
+- Keeps 30 days of logs
+- Compresses old logs
+- Maintains proper permissions
 
 ### Updates
 
-```bash
-# Navigate to project directory
-cd /var/www/fastconnect
+To update the application:
 
-# Pull latest changes
-git pull origin main
+1. **Backup current installation**:
 
-# Deploy updates
-sudo ./update-service.sh deploy
-```
+   ```bash
+   cp -r /var/www/fastconnect /var/www/fastconnect.backup.$(date +%Y%m%d)
+   ```
 
-### Health Monitoring
+2. **Upload new files**:
 
-```bash
-# Run comprehensive health check
-./healthcheck.sh
+   ```bash
+   # From your local machine
+   rsync -av --exclude='.git' --exclude='logs' ./ root@69.62.70.193:/var/www/fastconnect/
+   ```
 
-# Check specific components
-./install-dependencies.sh status
-sudo ./update-service.sh status
-```
+3. **Set permissions**:
+   ```bash
+   chown -R www-data:www-data /var/www/fastconnect
+   chmod -R 644 /var/www/fastconnect
+   find /var/www/fastconnect -type d -exec chmod 755 {} \;
+   ```
 
-### Rollback
-
-```bash
-# Complete system revert
-sudo ./revert-changes.sh complete
-
-# Partial revert (specific components)
-sudo ./revert-changes.sh partial ssl
-sudo ./revert-changes.sh partial nginx
-sudo ./revert-changes.sh partial project
-```
-
-## 🐛 Troubleshooting
+## 🛠 Troubleshooting
 
 ### Common Issues
 
-1. **Dependencies Missing:**
+1. **Website not accessible**:
 
    ```bash
-   # Check what's missing
-   ./install-dependencies.sh status
+   # Check Nginx status
+   systemctl status nginx
 
-   # Install missing dependencies
-   sudo ./install-dependencies.sh
-   ```
-
-2. **Permission Issues:**
-
-   ```bash
-   # Redeploy to fix permissions
-   sudo ./update-service.sh deploy
-   ```
-
-3. **SSL Certificate Issues:**
-
-   ```bash
-   # Regenerate SSL certificate
-   sudo ./generate-ssl.sh your-domain.com admin@your-domain.com
-   ```
-
-4. **Nginx Configuration:**
-
-   ```bash
-   # Test configuration
+   # Check Nginx configuration
    nginx -t
 
-   # Reload configuration
-   systemctl reload nginx
+   # Check firewall
+   ufw status
    ```
 
-5. **Service Issues:**
+2. **PHP errors**:
 
    ```bash
-   # Check service status
-   systemctl status nginx php8.3-fpm
+   # Check PHP-FPM status
+   systemctl status php8.3-fpm
 
-   # Restart services
-   systemctl restart nginx php8.3-fpm
+   # Check PHP error logs
+   tail -f /var/log/php8.3-fpm.log
    ```
 
-### Diagnostic Tools
+3. **SSL certificate issues**:
 
-Use the built-in diagnostic tools:
+   ```bash
+   # Check certificate status
+   certbot certificates
 
-```bash
-# Comprehensive system check
-./healthcheck.sh
+   # Test SSL configuration
+   openssl s_client -connect yourdomain.com:443
+   ```
 
-# Check installation status
-./install-dependencies.sh status
-
-# Check deployment status
-sudo ./update-service.sh status
-
-# Check logs
-tail -f /var/log/nginx/error.log
-tail -f logs/requests_$(date +%Y-%m-%d).log
-```
+4. **Permission issues**:
+   ```bash
+   # Fix file permissions
+   chown -R www-data:www-data /var/www/fastconnect
+   find /var/www/fastconnect -type f -exec chmod 644 {} \;
+   find /var/www/fastconnect -type d -exec chmod 755 {} \;
+   ```
 
 ### Log Analysis
 
-Check logs for errors:
+Check application logs for issues:
 
 ```bash
-# PHP errors
-tail -f /var/log/nginx/error.log
+# View recent requests
+tail -f /var/www/fastconnect/logs/requests_$(date +%Y-%m-%d).log
 
-# Application logs
-tail -f logs/requests_$(date +%Y-%m-%d).log | jq .
+# View API responses
+tail -f /var/www/fastconnect/logs/api_responses_$(date +%Y-%m-%d).log
 
-# API response logs
-tail -f logs/api_responses_$(date +%Y-%m-%d).log | jq .
+# View Nginx errors
+tail -f /var/log/nginx/fastconnect_error.log
 ```
 
-## 📋 Script Reference
+## 📞 Support
 
-### Installation Script
+For deployment issues or questions:
 
-```bash
-./install-dependencies.sh install    # Install all dependencies
-./install-dependencies.sh nginx      # Install Nginx only
-./install-dependencies.sh php        # Install PHP only
-./install-dependencies.sh status     # Check installation status
-```
+1. Check the deployment logs: `/var/log/fastconnect-deploy.log`
+2. Review the troubleshooting section above
+3. Verify all services are running: `systemctl status nginx php8.3-fpm`
 
-### Deployment Script
-
-```bash
-sudo ./update-service.sh deploy      # Deploy from current directory
-sudo ./update-service.sh status      # Show deployment status
-```
-
-### Health Check Script
-
-```bash
-./healthcheck.sh                     # Run all health checks
-./healthcheck.sh --quiet             # Silent mode
-./healthcheck.sh --format json       # JSON output
-./healthcheck.sh --output file.log   # Save to file
-```
-
-### SSL Management
-
-```bash
-./generate-ssl.sh                    # Generate with default domain
-./generate-ssl.sh domain.com         # Generate for specific domain
-./generate-ssl.sh domain.com email   # Generate with custom email
-```
-
-### System Recovery
-
-```bash
-sudo ./revert-changes.sh complete    # Complete system revert
-sudo ./revert-changes.sh partial ssl # Revert SSL only
-sudo ./revert-changes.sh status      # Show revert status
-```
-
-## 📝 License
+## 📄 License
 
 This project is proprietary software. All rights reserved.
 
-## 🤝 Support
-
-For support and deployment assistance, please refer to the [DEPLOYMENT.md](DEPLOYMENT.md) guide or contact the development team.
-
 ---
 
-**Note**: This landing page includes traffic cloaking functionality. Ensure compliance with all applicable laws and regulations in your jurisdiction.
+**FastConnect VPN** - Revolutionary VPN technology for the privacy-conscious user.
