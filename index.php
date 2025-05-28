@@ -469,7 +469,7 @@
         }
     </style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50 animate-gradient-x" x-data="FastConnect VPNApp()">
+<body class="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50 animate-gradient-x" x-data="app()">
     
     <!-- Header -->
     <header class="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
@@ -999,7 +999,7 @@
 
     <script>
         // Alpine.js component
-        function FastConnect VPNApp() {
+        function app() {
             return {
                 // Success modal state
                 showSuccessModal: false,

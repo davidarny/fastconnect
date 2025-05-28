@@ -64,7 +64,6 @@ The script will automatically:
 - Install and configure Nginx
 - Deploy project files
 - Setup SSL certificates with Let's Encrypt
-- Configure firewall rules
 - Setup log rotation
 - Run comprehensive health checks
 
@@ -239,7 +238,6 @@ tail -f /var/www/fastconnect/logs/requests_$(date +%Y-%m-%d).log
 - **Log Protection**: Nginx blocks access to log files
 - **Hidden Files Protection**: Blocks access to dotfiles
 - **Input Validation**: PHP filters and validation
-- **Firewall Configuration**: UFW rules for HTTP/HTTPS/SSH
 
 ### IP Restrictions
 
