@@ -318,7 +318,7 @@ sudo ./revert-changes.sh complete
 sudo ./update-service.sh status
 
 # Check service status
-systemctl status nginx php8.1-fpm
+systemctl status nginx php8.3-fpm
 
 # Test SSL certificate
 openssl s_client -connect yourdomain.com:443 -servername yourdomain.com
@@ -413,10 +413,10 @@ systemctl reload nginx
 
 ```bash
 # Check PHP-FPM status
-systemctl status php8.1-fpm
+systemctl status php8.3-fpm
 
 # Check PHP-FPM logs
-tail -f /var/log/php8.1-fpm.log
+tail -f /var/log/php8.3-fpm.log
 
 # Test PHP syntax
 php -l /var/www/fastconnect/index.php
@@ -479,7 +479,7 @@ For issues or questions:
 
 3. **Verify services:**
    ```bash
-   systemctl status nginx php8.1-fpm
+   systemctl status nginx php8.3-fpm
    nginx -t
    ```
 

@@ -6,7 +6,7 @@
 set -e
 
 # Configuration
-PHP_FPM_SERVICE="php8.1-fpm"
+PHP_FPM_SERVICE="php8.3-fpm"
 
 # Colors for output
 RED='\033[0;31m'
@@ -82,30 +82,23 @@ install_nginx() {
 install_php() {
     log "Installing PHP and required extensions..."
     
-    # Install PHP and PHP-FPM
-    apt-get install -y php8.1 php8.1-fpm php8.1-cli
+    # Install basic dependencies first
+    log "Installing basic dependencies..."
+    apt-get install -y software-properties-common apt-transport-https lsb-release ca-certificates wget curl gnupg unzip
     
-    # Install required PHP extensions
-    local required_extensions=("curl" "mbstring" "openssl" "json" "xml" "zip" "gd")
-    local extension_packages=()
-    
-    for ext in "${required_extensions[@]}"; do
-        case "$ext" in
-            "openssl")
-                # OpenSSL is usually built into PHP core
-                ;;
-            "json")
-                # JSON is usually built into PHP core in newer versions
-                ;;
-            *)
-                extension_packages+=("php8.1-$ext")
-                ;;
-        esac
-    done
-    
-    if [[ ${#extension_packages[@]} -gt 0 ]]; then
-        apt-get install -y "${extension_packages[@]}"
+    # Add PHP repository if not already added
+    log "Adding PHP repository..."
+    if ! grep -q "ondrej/php" /etc/apt/sources.list.d/* 2>/dev/null; then
+        LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php -y
+        apt-get update
+        log "PHP repository added and package lists updated"
+    else
+        log "PHP repository already exists"
     fi
+    
+    # Install PHP 8.3 and required extensions
+    log "Installing PHP 8.3 and extensions..."
+    apt-get install -y php8.3-fpm php8.3-curl php8.3-mbstring php8.3-xml php8.3-cli php8.3-zip php8.3-gd
     
     if command -v php &> /dev/null; then
         log "PHP installed successfully: $(php -v | head -n1)"
@@ -117,7 +110,7 @@ install_php() {
         
         # Verify required extensions
         local missing_extensions=()
-        for ext in curl mbstring openssl json filter; do
+        for ext in curl mbstring openssl json filter xml zip gd; do
             if ! php -m | grep -q "$ext"; then
                 missing_extensions+=("$ext")
             fi
@@ -204,7 +197,7 @@ check_status() {
         echo "  FPM Enabled: $(systemctl is-enabled $PHP_FPM_SERVICE 2>/dev/null || echo "disabled")"
         
         # Check extensions
-        local required_extensions=("curl" "mbstring" "openssl" "json" "filter")
+        local required_extensions=("curl" "mbstring" "openssl" "json" "filter" "xml" "zip" "gd")
         local missing_extensions=()
         
         for ext in "${required_extensions[@]}"; do

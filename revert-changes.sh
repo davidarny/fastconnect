@@ -11,7 +11,7 @@ BACKUP_DIR="/var/backups/fastconnect"
 NGINX_CONFIG="/etc/nginx/sites-available/fastconnect"
 NGINX_TEMP_CONFIG="/etc/nginx/sites-available/fastconnect-temp"
 SSL_DIR="/etc/ssl"
-PHP_FPM_SERVICE="php8.1-fpm"
+PHP_FPM_SERVICE="php8.3-fpm"
 
 # Colors for output
 RED='\033[0;31m'

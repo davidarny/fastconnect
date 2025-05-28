@@ -8,7 +8,7 @@ set -e
 # Configuration
 PROJECT_DIR="/var/www/fastconnect"
 NGINX_CONFIG="/etc/nginx/sites-available/fastconnect"
-PHP_FPM_SERVICE="php8.1-fpm"
+PHP_FPM_SERVICE="php8.3-fpm"
 
 # Colors for output
 RED='\033[0;31m'

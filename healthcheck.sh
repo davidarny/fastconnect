@@ -12,7 +12,7 @@ LOG_DIR="$PROJECT_DIR/logs"
 DOWNLOAD_FILE="$PROJECT_DIR/FastConnect_VPN.zip"
 CLOAKING_API="https://cloakit.house/api/v1/check"
 DOMAIN="https://fastconnectvpn.net"
-PHP_FPM_SERVICE="php8.1-fpm"
+PHP_FPM_SERVICE="php8.3-fpm"
 TIMEOUT=10
 
 # Colors for output

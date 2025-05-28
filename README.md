@@ -56,7 +56,7 @@ A PHP-based landing page for FastConnect VPN with traffic cloaking, request logg
    ```bash
    # Ubuntu/Debian
    apt update
-   apt install -y nginx php8.1-fpm php8.1-curl php8.1-mbstring php8.1-openssl php8.1-json
+   apt install -y nginx php8.3-fpm php8.3-curl php8.3-mbstring php8.3-openssl php8.3-json
    ```
 
 2. **Configure your web server** to point to the project directory
@@ -375,10 +375,10 @@ sudo ./revert-changes.sh partial project
 
    ```bash
    # Check service status
-   systemctl status nginx php8.1-fpm
+   systemctl status nginx php8.3-fpm
 
    # Restart services
-   systemctl restart nginx php8.1-fpm
+   systemctl restart nginx php8.3-fpm
    ```
 
 ### Diagnostic Tools
