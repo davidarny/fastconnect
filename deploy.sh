@@ -113,7 +113,8 @@ install_php() {
         php${PHP_VERSION} \
         php${PHP_VERSION}-fpm \
         php${PHP_VERSION}-cli \
-        php${PHP_VERSION}-curl >> "$LOG_FILE" 2>&1
+        php${PHP_VERSION}-curl \
+        php${PHP_VERSION}-mbstring >> "$LOG_FILE" 2>&1
     
     print_status "Configuring PHP-FPM..."
     
