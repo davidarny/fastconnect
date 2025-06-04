@@ -15,7 +15,7 @@ NC='\033[0m' # No Color
 # Configuration
 REMOTE_USER="root"
 REMOTE_HOST="69.62.70.193"
-REMOTE_PATH="/var/www/fastconnect/"
+REMOTE_PATH="/var/www/protectshield/"
 
 # Function to display usage
 show_usage() {
