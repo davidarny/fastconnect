@@ -112,21 +112,7 @@ install_php() {
     apt install -y \
         php${PHP_VERSION} \
         php${PHP_VERSION}-fpm \
-        php${PHP_VERSION}-cli \
-        php${PHP_VERSION}-common \
-        php${PHP_VERSION}-curl \
-        php${PHP_VERSION}-mbstring \
-        php${PHP_VERSION}-xml \
-        php${PHP_VERSION}-zip \
-        php${PHP_VERSION}-json \
-        php${PHP_VERSION}-opcache \
-        php${PHP_VERSION}-readline \
-        php${PHP_VERSION}-intl \
-        php${PHP_VERSION}-bcmath \
-        php${PHP_VERSION}-gd \
-        php${PHP_VERSION}-mysql \
-        php${PHP_VERSION}-pgsql \
-        php${PHP_VERSION}-sqlite3 >> "$LOG_FILE" 2>&1
+        php${PHP_VERSION}-cli >> "$LOG_FILE" 2>&1
     
     print_status "Configuring PHP-FPM..."
     
@@ -618,7 +604,7 @@ show_summary() {
 
 # Main deployment function
 main() {
-    print_header "FASTCONNECT VPN DEPLOYMENT SCRIPT"
+    print_header "VPN DEPLOYMENT SCRIPT"
     
     # Check if running as root
     if [ "$EUID" -ne 0 ]; then
