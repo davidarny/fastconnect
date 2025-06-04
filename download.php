@@ -1,5 +1,5 @@
 <?php
-$file_path = __DIR__ . '/FastConnect_VPN.zip';
+$file_path = __DIR__ . '/ProtectShield.zip';
 
 // Check if file exists
 if (!file_exists($file_path)) {
@@ -18,7 +18,7 @@ $file_size = filesize($file_path);
 
 // Set headers for file download
 header('Content-Type: application/zip');
-header('Content-Disposition: attachment; filename="FastConnect_VPN.zip"');
+header('Content-Disposition: attachment; filename="ProtectShield.zip"');
 header('Content-Length: ' . $file_size);
 header('Cache-Control: must-revalidate');
 header('Pragma: public');
