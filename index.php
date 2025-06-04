@@ -983,7 +983,7 @@
                     }
                 },
 
-                // Download app function - only works for offer pages
+                <?php if ($is_offer_page): ?>
                 downloadApp() {
                     const link = document.createElement('a');
                     link.href = '/download.php';
@@ -991,6 +991,7 @@
                     link.click();
                     this.showSuccessModal = true;
                 },
+                <?php endif; ?>
 
                 // Close success modal function
                 closeSuccessModal() {
