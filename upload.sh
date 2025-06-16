@@ -14,7 +14,7 @@ NC='\033[0m' # No Color
 
 # Configuration
 REMOTE_USER="root"
-REMOTE_HOST="5.183.11.191"
+REMOTE_HOST="31.97.138.165"
 REMOTE_PATH="/var/www/fastconnect/"
 
 # Function to display usage
