@@ -1,6 +1,6 @@
-# ProtectShield VPN Landing Page
+# FastConnect VPN Landing Page
 
-A modern, responsive landing page for ProtectShield VPN with advanced privacy features, dynamic location switching, and AI-powered security. Built with PHP, featuring a sleek design with Tailwind CSS and Alpine.js.
+A modern, responsive landing page for FastConnect VPN with advanced privacy features, dynamic location switching, and AI-powered security. Built with PHP, featuring a sleek design with Tailwind CSS and Alpine.js.
 
 ## 🚀 Features
 
@@ -27,7 +27,7 @@ A modern, responsive landing page for ProtectShield VPN with advanced privacy fe
 
    ```bash
    git clone <repository-url>
-   cd protectshield
+   cd fastconnect
    ```
 
 2. **Upload to server** using the provided upload script:
@@ -37,14 +37,14 @@ A modern, responsive landing page for ProtectShield VPN with advanced privacy fe
    ./upload.sh deploy.sh
 
    # Upload all project files
-   rsync -av --exclude='.git' --exclude='logs' --exclude='.DS_Store' ./ root@69.62.70.193:/root/protectshield/
+   rsync -av --exclude='.git' --exclude='logs' --exclude='.DS_Store' ./ root@69.62.70.193:/root/fastconnect/
    ```
 
 3. **SSH to your server**:
 
    ```bash
    ssh root@69.62.70.193
-   cd /root/protectshield
+   cd /root/fastconnect
    ```
 
 4. **Run the deployment script**:
@@ -106,9 +106,9 @@ If you prefer manual deployment, follow these steps:
 5. **Deploy project files**:
 
    ```bash
-   mkdir -p /var/www/protectshield
-   # Copy your project files to /var/www/protectshield
-   chown -R www-data:www-data /var/www/protectshield
+   mkdir -p /var/www/fastconnect
+   # Copy your project files to /var/www/fastconnect
+   chown -R www-data:www-data /var/www/fastconnect
    ```
 
 6. **Configure Nginx** (use the provided nginx.conf as reference)
@@ -123,7 +123,7 @@ If you prefer manual deployment, follow these steps:
 ## 📁 Project Structure
 
 ```
-protectshield/
+fastconnect/
 ├── index.php              # Main landing page
 ├── download.php            # File download handler
 ├── logs.php               # Log viewer (protected)
@@ -150,7 +150,7 @@ protectshield/
 The application uses the following configuration in `index.php`:
 
 ```php
-$domain = 'https://protectshield.net';  // Your domain
+$domain = 'https://fastconnectvpn.net';  // Your domain
 ```
 
 ### Cloaking API
@@ -199,7 +199,7 @@ The application generates several types of logs:
 3. **System Logs**:
    - Nginx access: `/var/log/nginx/fastconnect_access.log`
    - Nginx errors: `/var/log/nginx/fastconnect_error.log`
-   - Deployment: `/var/log/protectshield-deploy.log`
+   - Deployment: `/var/log/fastconnect-deploy.log`
 
 ### Log Viewer
 
@@ -226,7 +226,7 @@ curl -I https://yourdomain.com
 
 # View recent logs
 tail -f /var/log/nginx/fastconnect_error.log
-tail -f /var/www/protectshield/logs/requests_$(date +%Y-%m-%d).log
+tail -f /var/www/fastconnect/logs/requests_$(date +%Y-%m-%d).log
 ```
 
 ## 🔒 Security Features
@@ -295,21 +295,21 @@ To update the application:
 1. **Backup current installation**:
 
    ```bash
-   cp -r /var/www/protectshield /var/www/protectshield.backup.$(date +%Y%m%d)
+   cp -r /var/www/fastconnect /var/www/fastconnect.backup.$(date +%Y%m%d)
    ```
 
 2. **Upload new files**:
 
    ```bash
    # From your local machine
-   rsync -av --exclude='.git' --exclude='logs' ./ root@69.62.70.193:/var/www/protectshield/
+   rsync -av --exclude='.git' --exclude='logs' ./ root@69.62.70.193:/var/www/fastconnect/
    ```
 
 3. **Set permissions**:
    ```bash
-   chown -R www-data:www-data /var/www/protectshield
-   chmod -R 644 /var/www/protectshield
-   find /var/www/protectshield -type d -exec chmod 755 {} \;
+   chown -R www-data:www-data /var/www/fastconnect
+   chmod -R 644 /var/www/fastconnect
+   find /var/www/fastconnect -type d -exec chmod 755 {} \;
    ```
 
 ## 🛠 Troubleshooting
@@ -352,9 +352,9 @@ To update the application:
 4. **Permission issues**:
    ```bash
    # Fix file permissions
-   chown -R www-data:www-data /var/www/protectshield
-   find /var/www/protectshield -type f -exec chmod 644 {} \;
-   find /var/www/protectshield -type d -exec chmod 755 {} \;
+   chown -R www-data:www-data /var/www/fastconnect
+   find /var/www/fastconnect -type f -exec chmod 644 {} \;
+   find /var/www/fastconnect -type d -exec chmod 755 {} \;
    ```
 
 ### Log Analysis
@@ -363,10 +363,10 @@ Check application logs for issues:
 
 ```bash
 # View recent requests
-tail -f /var/www/protectshield/logs/requests_$(date +%Y-%m-%d).log
+tail -f /var/www/fastconnect/logs/requests_$(date +%Y-%m-%d).log
 
 # View API responses
-tail -f /var/www/protectshield/logs/api_responses_$(date +%Y-%m-%d).log
+tail -f /var/www/fastconnect/logs/api_responses_$(date +%Y-%m-%d).log
 
 # View Nginx errors
 tail -f /var/log/nginx/fastconnect_error.log
@@ -376,7 +376,7 @@ tail -f /var/log/nginx/fastconnect_error.log
 
 For deployment issues or questions:
 
-1. Check the deployment logs: `/var/log/protectshield-deploy.log`
+1. Check the deployment logs: `/var/log/fastconnect-deploy.log`
 2. Review the troubleshooting section above
 3. Verify all services are running: `systemctl status nginx php8.3-fpm`
 
@@ -386,4 +386,4 @@ This project is proprietary software. All rights reserved.
 
 ---
 
-**ProtectShield VPN** - Revolutionary VPN technology for the privacy-conscious user.
+**FastConnect VPN** - Revolutionary VPN technology for the privacy-conscious user.

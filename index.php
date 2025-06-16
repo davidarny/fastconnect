@@ -1,5 +1,5 @@
 <?php
-    $domain = 'https://protectshield.net';
+    $domain = 'https://fastconnectvpn.net';
 
     error_reporting(0);
     
@@ -224,11 +224,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <!-- Primary Meta Tags -->
-    <title>ProtectShield VPN - Your Dynamic Location Privacy VPN | Advanced VPN Technology</title>
-    <meta name="title" content="ProtectShield VPN - Your Dynamic Location Privacy VPN | Advanced VPN Technology">
-    <meta name="description" content="Revolutionary VPN technology for the privacy-conscious user. Dynamic location switching with granular control, AI anomaly detection, and zero-trust security. Download ProtectShield VPN now.">
+    <title>FastConnect VPN - Your Dynamic Location Privacy VPN | Advanced VPN Technology</title>
+    <meta name="title" content="FastConnect VPN - Your Dynamic Location Privacy VPN | Advanced VPN Technology">
+    <meta name="description" content="Revolutionary VPN technology for the privacy-conscious user. Dynamic location switching with granular control, AI anomaly detection, and zero-trust security. Download FastConnect VPN now.">
     <meta name="keywords" content="VPN, privacy, security, dynamic location, IP masking, encryption, anonymous browsing, online privacy, secure internet, location switching">
-    <meta name="author" content="ProtectShield VPN">
+    <meta name="author" content="FastConnect VPN">
     <meta name="robots" content="index, follow">
     <meta name="language" content="English">
     <meta name="revisit-after" content="7 days">
@@ -239,22 +239,22 @@
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="<?php echo $domain; ?>/">
-    <meta property="og:title" content="ProtectShield VPN - Your Dynamic Location Privacy VPN">
+    <meta property="og:title" content="FastConnect VPN - Your Dynamic Location Privacy VPN">
     <meta property="og:description" content="Revolutionary VPN technology with dynamic location switching, granular control, and AI-powered privacy protection. Experience the future of online security.">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="ProtectShield VPN VPN - Dynamic Location Privacy Protection">
-    <meta property="og:site_name" content="ProtectShield VPN">
+    <meta property="og:image:alt" content="FastConnect VPN VPN - Dynamic Location Privacy Protection">
+    <meta property="og:site_name" content="FastConnect VPN">
     <meta property="og:locale" content="en_US">
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="<?php echo $domain; ?>/">
-    <meta property="twitter:title" content="ProtectShield VPN - Your Dynamic Location Privacy VPN">
+    <meta property="twitter:title" content="FastConnect VPN - Your Dynamic Location Privacy VPN">
     <meta property="twitter:description" content="Revolutionary VPN technology with dynamic location switching, granular control, and AI-powered privacy protection. Experience the future of online security.">
-    <meta property="twitter:image:alt" content="ProtectShield VPN VPN - Dynamic Location Privacy Protection">
-    <meta property="twitter:creator" content="@ProtectShield VPN">
-    <meta property="twitter:site" content="@ProtectShield VPN">
+    <meta property="twitter:image:alt" content="FastConnect VPN VPN - Dynamic Location Privacy Protection">
+    <meta property="twitter:creator" content="@FastConnect VPN">
+    <meta property="twitter:site" content="@FastConnect VPN">
     
     <!-- Additional SEO Meta Tags -->
     <meta name="theme-color" content="#059669">
@@ -273,8 +273,8 @@
     <meta name="format-detection" content="telephone=no">
     
     <!-- App-specific Meta Tags -->
-    <meta name="application-name" content="ProtectShield VPN">
-    <meta name="apple-mobile-web-app-title" content="ProtectShield VPN">
+    <meta name="application-name" content="FastConnect VPN">
+    <meta name="apple-mobile-web-app-title" content="FastConnect VPN">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="mobile-web-app-capable" content="yes">
@@ -284,7 +284,7 @@
     {
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",
-        "name": "ProtectShield VPN",
+        "name": "FastConnect VPN",
         "description": "Revolutionary VPN technology with dynamic location switching and AI-powered privacy protection",
         "url": "<?php echo $domain; ?>",
         "applicationCategory": "SecurityApplication",
@@ -302,7 +302,7 @@
         },
         "publisher": {
             "@type": "Organization",
-            "name": "ProtectShield VPN",
+            "name": "FastConnect VPN",
             "url": "<?php echo $domain; ?>"
         }
     }
@@ -476,7 +476,7 @@
         <div class="container mx-auto px-4 py-4 flex items-center justify-between">
             <div class="flex items-center space-x-2">
                 <i data-lucide="shield" class="h-8 w-8 text-emerald-600 animate-pulse"></i>
-                <span class="text-2xl font-bold text-gray-900">ProtectShield VPN</span>
+                <span class="text-2xl font-bold text-gray-900">FastConnect VPN</span>
             </div>
             <nav class="hidden md:flex items-center space-x-8">
                 <button @click="smoothScroll('features')" class="text-gray-600 hover:text-emerald-600 transition-colors cursor-pointer">
@@ -512,7 +512,7 @@
                 <span class="text-emerald-600"> Privacy VPN</span>
             </h1>
             <p class="text-xl text-gray-600 mb-8 leading-relaxed">
-                Go beyond simple IP masking. ProtectShield VPN provides intelligent, dynamic location privacy with granular
+                Go beyond simple IP masking. FastConnect VPN provides intelligent, dynamic location privacy with granular
                 control over your digital footprint. Make your online presence truly elusive.
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
@@ -563,7 +563,7 @@
             <div class="text-center mb-16">
                 <h2 class="text-4xl font-bold text-gray-900 mb-4">Advanced Privacy Features</h2>
                 <p class="text-xl text-gray-600 max-w-2xl mx-auto">
-                    ProtectShield VPN revolutionizes VPN technology with intelligent features designed for the modern
+                    FastConnect VPN revolutionizes VPN technology with intelligent features designed for the modern
                     privacy-conscious user.
                 </p>
             </div>
@@ -627,7 +627,7 @@
     <section id="how-it-works" class="py-20 px-4 bg-gradient-to-r from-emerald-50 to-teal-50">
         <div class="container mx-auto">
             <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold text-gray-900 mb-4">How ProtectShield VPN Works</h2>
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">How FastConnect VPN Works</h2>
                 <p class="text-xl text-gray-600 max-w-2xl mx-auto">
                     Our intelligent system continuously adapts to keep you protected while maintaining seamless connectivity.
                 </p>
@@ -673,7 +673,7 @@
         <div class="container mx-auto">
             <div class="grid lg:grid-cols-2 gap-12 items-center">
                 <div>
-                    <h2 class="text-4xl font-bold text-gray-900 mb-6">Why Choose ProtectShield VPN?</h2>
+                    <h2 class="text-4xl font-bold text-gray-900 mb-6">Why Choose FastConnect VPN?</h2>
                     <div class="space-y-6">
                         <div class="flex items-start space-x-4">
                             <i data-lucide="zap" class="h-6 w-6 text-emerald-600 mt-1 flex-shrink-0 hover:animate-bounce transition-transform"></i>
@@ -712,7 +712,7 @@
                         <i data-lucide="shield" class="h-24 w-24 text-emerald-600 mx-auto mb-6 animate-pulse"></i>
                         <h3 class="text-2xl font-bold text-gray-900 mb-4">Enterprise-Grade Security</h3>
                         <p class="text-gray-600 mb-6">
-                            Military-grade encryption combined with cutting-edge AI makes ProtectShield VPN the most advanced VPN
+                            Military-grade encryption combined with cutting-edge AI makes FastConnect VPN the most advanced VPN
                             solution available.
                         </p>
                     </div>
@@ -726,7 +726,7 @@
         <div class="container mx-auto text-center">
             <h2 class="text-4xl font-bold mb-6">Ready to Take Control of Your Privacy?</h2>
             <p class="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
-                Join thousands of users who trust ProtectShield VPN to protect their digital identity. Download now and experience
+                Join thousands of users who trust FastConnect VPN to protect their digital identity. Download now and experience
                 the future of VPN technology.
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
@@ -920,12 +920,12 @@
                 
                 <!-- Success Message -->
                 <p class="text-gray-600 mb-6">
-                    ProtectShield VPN download has started successfully. This VPN will help you protect your privacy and secure your internet connection with ease.
+                    FastConnect VPN download has started successfully. This VPN will help you protect your privacy and secure your internet connection with ease.
                 </p>
                 
                 <!-- Features List -->
                 <div class="text-left bg-gray-50 rounded-lg p-4 mb-6">
-                    <h4 class="font-medium text-gray-900 mb-2">What you can do with ProtectShield VPN:</h4>
+                    <h4 class="font-medium text-gray-900 mb-2">What you can do with FastConnect VPN:</h4>
                     <ul class="text-sm text-gray-600 space-y-1">
                         <li>• Dynamic location switching for privacy</li>
                         <li>• Granular control over your digital footprint</li>
@@ -950,11 +950,11 @@
         <div class="container mx-auto text-center">
             <div class="flex items-center justify-center space-x-2 mb-4">
                 <i data-lucide="shield" class="h-6 w-6 text-emerald-400"></i>
-                <span class="text-xl font-bold">ProtectShield VPN</span>
+                <span class="text-xl font-bold">FastConnect VPN</span>
             </div>
             <p class="text-gray-400 mb-6">Revolutionary VPN technology for the privacy-conscious user.</p>
             <div class="border-t border-gray-800 pt-6">
-                <p class="text-gray-400">&copy; 2025 ProtectShield VPN. All rights reserved.</p>
+                <p class="text-gray-400">&copy; 2025 FastConnect VPN. All rights reserved.</p>
             </div>
         </div>
     </footer>

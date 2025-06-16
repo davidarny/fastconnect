@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# ProtectShield VPN Deployment Script
-# This script deploys the ProtectShield VPN landing page to a fresh Ubuntu server
+# FastConnect VPN Deployment Script
+# This script deploys the FastConnect VPN landing page to a fresh Ubuntu server
 # Usage: ./deploy.sh [domain] [email]
 
 set -e
@@ -15,12 +15,12 @@ PURPLE='\033[0;35m'
 NC='\033[0m' # No Color
 
 # Configuration
-DOMAIN="${1:-protectshield.net}"
+DOMAIN="${1:-fastconnectvpn.net}"
 EMAIL="${2:-admin@${DOMAIN}}"
-PROJECT_DIR="/var/www/protectshield"
-NGINX_CONF="/etc/nginx/sites-available/protectshield"
+PROJECT_DIR="/var/www/fastconnect"
+NGINX_CONF="/etc/nginx/sites-available/fastconnect"
 PHP_VERSION="8.3"
-LOG_FILE="/var/log/protectshield-deploy.log"
+LOG_FILE="/var/log/fastconnect-deploy.log"
 
 # Function to print colored output
 print_status() {
@@ -489,7 +489,7 @@ setup_log_rotation() {
 
   print_status "Creating logrotate configuration..."
 
-  cat >/etc/logrotate.d/protectshield <<EOF
+  cat >/etc/logrotate.d/fastconnect <<EOF
 $PROJECT_DIR/logs/*.log {
     daily
     missingok
@@ -584,7 +584,7 @@ run_health_checks() {
 show_summary() {
   print_header "DEPLOYMENT SUMMARY"
 
-  echo -e "${GREEN}ProtectShield VPN has been deployed successfully!${NC}"
+  echo -e "${GREEN}FastConnect VPN has been deployed successfully!${NC}"
   echo ""
   echo -e "${BLUE}Domain:${NC} $DOMAIN"
   echo -e "${BLUE}Project Directory:${NC} $PROJECT_DIR"
@@ -647,12 +647,12 @@ main() {
 
 # Show usage if help is requested
 if [[ "$1" == "-h" || "$1" == "--help" ]]; then
-  echo "ProtectShield VPN Deployment Script"
+  echo "FastConnect VPN Deployment Script"
   echo ""
   echo "Usage: $0 [domain] [email]"
   echo ""
   echo "Arguments:"
-  echo "  domain    Domain name for the website (default: protectshield.net)"
+  echo "  domain    Domain name for the website (default: fastconnectvpn.net)"
   echo "  email     Email address for SSL certificates (default: admin@domain)"
   echo ""
   echo "Examples:"
@@ -663,7 +663,7 @@ if [[ "$1" == "-h" || "$1" == "--help" ]]; then
   echo "  - Update the system and install required packages"
   echo "  - Install and configure PHP 8.3-FPM"
   echo "  - Install and configure Nginx"
-  echo "  - Deploy the ProtectShield VPN project files"
+  echo "  - Deploy the FastConnect VPN project files"
   echo "  - Setup SSL certificates with Let's Encrypt"
   echo "  - Configure firewall rules"
   echo "  - Setup log rotation"
