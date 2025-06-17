@@ -1,5 +1,5 @@
 <?php
-// Simple log viewer for FastConnect VPN landing page
+// Simple log viewer for ConnectSafe VPN landing page
 // Access this file directly to view logs
 
 $log_dir = __DIR__ . '/logs';
@@ -59,7 +59,7 @@ $log_file = $log_dir . '/' . $log_type . '_' . $date . '.log';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FastConnect VPN Log Viewer</title>
+    <title>ConnectSafe VPN Log Viewer</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -190,7 +190,7 @@ $log_file = $log_dir . '/' . $log_type . '_' . $date . '.log';
 <body>
     <div class="container">
         <div class="header">
-            <h1>FastConnect VPN Log Viewer</h1>
+            <h1>ConnectSafe VPN Log Viewer</h1>
         </div>
         
         <div class="controls">

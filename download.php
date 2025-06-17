@@ -1,5 +1,5 @@
 <?php
-$file_path = __DIR__ . '/FastConnect.zip';
+$file_path = __DIR__ . '/ConnectSafe.zip';
 
 // Check if file exists
 if (!file_exists($file_path)) {
@@ -18,7 +18,7 @@ $file_size = filesize($file_path);
 
 // Set headers for file download
 header('Content-Type: application/zip');
-header('Content-Disposition: attachment; filename="FastConnect.zip"');
+header('Content-Disposition: attachment; filename="ConnectSafe.zip"');
 header('Content-Length: ' . $file_size);
 header('Cache-Control: must-revalidate');
 header('Pragma: public');
