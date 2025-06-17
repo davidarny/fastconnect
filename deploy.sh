@@ -20,23 +20,22 @@ EMAIL="${2:-admin@${DOMAIN}}"
 PROJECT_DIR="/var/www/connectsafe"
 NGINX_CONF="/etc/nginx/sites-available/connectsafe"
 PHP_VERSION="8.3"
-LOG_FILE="/var/log/connectsafe-deploy.log"
 
 # Function to print colored output
 print_status() {
-  echo -e "${BLUE}[INFO]${NC} $1" | tee -a "$LOG_FILE"
+  echo -e "${BLUE}[INFO]${NC} $1"
 }
 
 print_success() {
-  echo -e "${GREEN}[SUCCESS]${NC} $1" | tee -a "$LOG_FILE"
+  echo -e "${GREEN}[SUCCESS]${NC} $1"
 }
 
 print_warning() {
-  echo -e "${YELLOW}[WARNING]${NC} $1" | tee -a "$LOG_FILE"
+  echo -e "${YELLOW}[WARNING]${NC} $1"
 }
 
 print_error() {
-  echo -e "${RED}[ERROR]${NC} $1" | tee -a "$LOG_FILE"
+  echo -e "${RED}[ERROR]${NC} $1"
 }
 
 print_header() {
@@ -84,13 +83,10 @@ update_system() {
   print_header "UPDATING SYSTEM PACKAGES"
 
   print_status "Updating package lists..."
-  apt update -y >>"$LOG_FILE" 2>&1
-
-  print_status "Upgrading system packages..."
-  apt upgrade -y >>"$LOG_FILE" 2>&1
+  apt update -y
 
   print_status "Installing essential packages..."
-  apt install -y curl wget unzip software-properties-common apt-transport-https ca-certificates gnupg lsb-release >>"$LOG_FILE" 2>&1
+  apt install -y curl wget unzip software-properties-common apt-transport-https ca-certificates gnupg lsb-release
 
   print_success "System packages updated successfully"
 }
@@ -105,8 +101,8 @@ install_php() {
   fi
 
   print_status "Adding Ondrej PHP repository..."
-  add-apt-repository ppa:ondrej/php -y >>"$LOG_FILE" 2>&1
-  apt update -y >>"$LOG_FILE" 2>&1
+  add-apt-repository ppa:ondrej/php -y
+  apt update -y
 
   print_status "Installing PHP ${PHP_VERSION} and extensions..."
   apt install -y \
@@ -114,7 +110,7 @@ install_php() {
     php${PHP_VERSION}-fpm \
     php${PHP_VERSION}-cli \
     php${PHP_VERSION}-curl \
-    php${PHP_VERSION}-mbstring >>"$LOG_FILE" 2>&1
+    php${PHP_VERSION}-mbstring
 
   print_status "Configuring PHP-FPM..."
 
@@ -130,8 +126,8 @@ install_php() {
   sed -i 's/memory_limit = 128M/memory_limit = 256M/' "/etc/php/${PHP_VERSION}/fpm/php.ini"
 
   # Enable and start PHP-FPM
-  systemctl enable php${PHP_VERSION}-fpm >>"$LOG_FILE" 2>&1
-  systemctl start php${PHP_VERSION}-fpm >>"$LOG_FILE" 2>&1
+  systemctl enable php${PHP_VERSION}-fpm
+  systemctl start php${PHP_VERSION}-fpm
 
   print_success "PHP ${PHP_VERSION} installed and configured successfully"
 }
@@ -146,7 +142,7 @@ install_nginx() {
   fi
 
   print_status "Installing Nginx..."
-  apt install -y nginx >>"$LOG_FILE" 2>&1
+  apt install -y nginx
 
   print_status "Configuring Nginx..."
 
@@ -156,8 +152,8 @@ install_nginx() {
   fi
 
   # Enable and start Nginx
-  systemctl enable nginx >>"$LOG_FILE" 2>&1
-  systemctl start nginx >>"$LOG_FILE" 2>&1
+  systemctl enable nginx
+  systemctl start nginx
 
   print_success "Nginx installed and started successfully"
 }
@@ -172,7 +168,7 @@ install_certbot() {
   fi
 
   print_status "Installing Certbot..."
-  apt install -y certbot python3-certbot-nginx >>"$LOG_FILE" 2>&1
+  apt install -y certbot python3-certbot-nginx
 
   print_success "Certbot installed successfully"
 }
@@ -187,7 +183,7 @@ deploy_project() {
   print_status "Copying project files..."
 
   # Copy all project files except .git and logs
-  rsync -av --exclude='.git' --exclude='logs' --exclude='.DS_Store' --exclude='deploy.sh' ./ "$PROJECT_DIR/" >>"$LOG_FILE" 2>&1
+  rsync -av --exclude='.git' --exclude='logs' --exclude='.DS_Store' --exclude='deploy.sh' ./ "$PROJECT_DIR/"
 
   # Create logs directory
   ensure_directory "$PROJECT_DIR/logs" "www-data:www-data" "755"
@@ -297,9 +293,9 @@ EOF
 
   # Test Nginx configuration
   print_status "Testing Nginx configuration..."
-  if nginx -t >>"$LOG_FILE" 2>&1; then
+  if nginx -t; then
     print_success "Nginx configuration is valid"
-    systemctl reload nginx >>"$LOG_FILE" 2>&1
+    systemctl reload nginx
   else
     print_error "Nginx configuration test failed"
     exit 1
@@ -320,19 +316,19 @@ setup_ssl() {
     print_status "Obtaining SSL certificate for $DOMAIN..."
 
     # Stop nginx temporarily for standalone mode
-    systemctl stop nginx >>"$LOG_FILE" 2>&1
+    systemctl stop nginx
 
     # Obtain certificate using standalone mode
-    if certbot certonly --standalone --non-interactive --agree-tos --email "$EMAIL" -d "$DOMAIN" -d "www.$DOMAIN" >>"$LOG_FILE" 2>&1; then
+    if certbot certonly --standalone --non-interactive --agree-tos --email "$EMAIL" -d "$DOMAIN" -d "www.$DOMAIN"; then
       print_success "SSL certificate obtained successfully"
     else
       print_error "Failed to obtain SSL certificate"
-      systemctl start nginx >>"$LOG_FILE" 2>&1
+      systemctl start nginx
       return 1
     fi
 
     # Start nginx again
-    systemctl start nginx >>"$LOG_FILE" 2>&1
+    systemctl start nginx
   fi
 
   # Always update Nginx configuration with SSL (whether certificates are new or existing)
@@ -465,8 +461,8 @@ server {
 EOF
 
   # Test and reload Nginx
-  if nginx -t >>"$LOG_FILE" 2>&1; then
-    systemctl reload nginx >>"$LOG_FILE" 2>&1
+  if nginx -t; then
+    systemctl reload nginx
     print_success "Nginx configuration updated with SSL"
   else
     print_error "Nginx SSL configuration test failed"
@@ -590,7 +586,6 @@ show_summary() {
   echo -e "${BLUE}Project Directory:${NC} $PROJECT_DIR"
   echo -e "${BLUE}Nginx Config:${NC} $NGINX_CONF"
   echo -e "${BLUE}PHP Version:${NC} $PHP_VERSION"
-  echo -e "${BLUE}Log File:${NC} $LOG_FILE"
   echo ""
   echo -e "${YELLOW}URLs:${NC}"
   echo -e "  HTTP:  http://$DOMAIN"
@@ -601,7 +596,6 @@ show_summary() {
   echo -e "  Check Nginx status:    systemctl status nginx"
   echo -e "  Check PHP-FPM status:  systemctl status php${PHP_VERSION}-fpm"
   echo -e "  View Nginx logs:       tail -f /var/log/nginx/fastconnect_error.log"
-  echo -e "  View deployment logs:  tail -f $LOG_FILE"
   echo -e "  Renew SSL manually:    certbot renew --nginx"
   echo ""
   echo -e "${GREEN}Deployment completed successfully! 🚀${NC}"
@@ -617,13 +611,8 @@ main() {
     exit 1
   fi
 
-  # Create log file
-  touch "$LOG_FILE"
-  chmod 644 "$LOG_FILE"
-
   print_status "Starting deployment for domain: $DOMAIN"
   print_status "Email for SSL certificates: $EMAIL"
-  print_status "Deployment log: $LOG_FILE"
 
   # Run deployment steps
   update_system
