@@ -1,4 +1,5 @@
 <?php
+    $disable_cloaking = true;
     $domain = 'https://connectsafevpn.org';
 
     error_reporting(0);
@@ -152,69 +153,96 @@
     $is_white_page = false;
     $is_offer_page = false;
 
-    $ch = curl_init('https://cloakit.house/api/v1/check');
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER  => TRUE,
-        CURLOPT_CUSTOMREQUEST   => 'POST',
-        CURLOPT_SSL_VERIFYPEER  => FALSE,
-        CURLOPT_TIMEOUT         => 15,
-        CURLOPT_POSTFIELDS      => $request_data
-    ]);
-    
-    $result = curl_exec($ch);
-    $info   = curl_getinfo($ch);
-    curl_close($ch);
-
-    // Log the cloaking API response
-    $api_log_data = [
-        'timestamp' => date('Y-m-d H:i:s'),
-        'api_url' => 'https://cloakit.house/api/v1/check',
-        'http_code' => $info['http_code'] ?? 'unknown',
-        'response_time' => $info['total_time'] ?? 0,
-        'response_size' => $info['size_download'] ?? 0,
-        'curl_error' => curl_error($ch) ?: 'none',
-        'request_ip' => get_real_ip_address(),
-        'response_body' => $result ? substr($result, 0, 500) : 'empty' // Log first 500 chars
-    ];
-    
-    $api_log_entry = json_encode($api_log_data) . "\n";
-    $log_dir = __DIR__ . '/logs';
-    if (!is_dir($log_dir)) {
-        mkdir($log_dir, 0755, true);
-    }
-    $api_log_file = $log_dir . '/api_responses_' . date('Y-m-d') . '.log';
-    file_put_contents($api_log_file, $api_log_entry, FILE_APPEND | LOCK_EX);
-
-    if (isset($info['http_code']) && in_array($info['http_code'], $success_codes)) {
-        $body = json_decode($result, TRUE);
-
-        // Check for errors
-        if (!empty($body['filter_type'])) {
-            $messages = [
-                'subscription_expired'  => 'Your Subscription Expired.',
-                'flow_deleted'          => 'Flow Deleted.',
-                'flow_banned'           => 'Flow Banned.',
-            ];
+    // Check if cloaking is disabled
+    if ($disable_cloaking) {
+        // If cloaking is disabled, always show offer page
+        $is_offer_page = true;
         
-            if (isset($messages[$body['filter_type']])) {
-                exit($messages[$body['filter_type']]);
-            }
+        // Log that cloaking was disabled
+        $api_log_data = [
+            'timestamp' => date('Y-m-d H:i:s'),
+            'api_url' => 'cloaking_disabled',
+            'http_code' => 'disabled',
+            'response_time' => 0,
+            'response_size' => 0,
+            'curl_error' => 'cloaking disabled by hardcoded variable',
+            'request_ip' => get_real_ip_address(),
+            'response_body' => 'cloaking disabled - showing offer page'
+        ];
+        
+        $api_log_entry = json_encode($api_log_data) . "\n";
+        $log_dir = __DIR__ . '/logs';
+        if (!is_dir($log_dir)) {
+            mkdir($log_dir, 0755, true);
         }
+        $api_log_file = $log_dir . '/api_responses_' . date('Y-m-d') . '.log';
+        file_put_contents($api_log_file, $api_log_entry, FILE_APPEND | LOCK_EX);
+    } else {
+        // Original cloaking logic
+        $ch = curl_init('https://cloakit.house/api/v1/check');
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER  => TRUE,
+            CURLOPT_CUSTOMREQUEST   => 'POST',
+            CURLOPT_SSL_VERIFYPEER  => FALSE,
+            CURLOPT_TIMEOUT         => 15,
+            CURLOPT_POSTFIELDS      => $request_data
+        ]);
         
+        $result = curl_exec($ch);
+        $info   = curl_getinfo($ch);
+        curl_close($ch);
 
-        if (!empty($body['url_white_page']) && !empty($body['url_offer_page'])) {
-            // Set page type flags
-            if ($body['filter_page'] == 'white') {
-                $is_white_page = true;
-            } elseif ($body['filter_page'] == 'offer') {
-                $is_offer_page = true;
+        // Log the cloaking API response
+        $api_log_data = [
+            'timestamp' => date('Y-m-d H:i:s'),
+            'api_url' => 'https://cloakit.house/api/v1/check',
+            'http_code' => $info['http_code'] ?? 'unknown',
+            'response_time' => $info['total_time'] ?? 0,
+            'response_size' => $info['size_download'] ?? 0,
+            'curl_error' => curl_error($ch) ?: 'none',
+            'request_ip' => get_real_ip_address(),
+            'response_body' => $result ? substr($result, 0, 500) : 'empty' // Log first 500 chars
+        ];
+        
+        $api_log_entry = json_encode($api_log_data) . "\n";
+        $log_dir = __DIR__ . '/logs';
+        if (!is_dir($log_dir)) {
+            mkdir($log_dir, 0755, true);
+        }
+        $api_log_file = $log_dir . '/api_responses_' . date('Y-m-d') . '.log';
+        file_put_contents($api_log_file, $api_log_entry, FILE_APPEND | LOCK_EX);
+
+        if (isset($info['http_code']) && in_array($info['http_code'], $success_codes)) {
+            $body = json_decode($result, TRUE);
+
+            // Check for errors
+            if (!empty($body['filter_type'])) {
+                $messages = [
+                    'subscription_expired'  => 'Your Subscription Expired.',
+                    'flow_deleted'          => 'Flow Deleted.',
+                    'flow_banned'           => 'Flow Banned.',
+                ];
+            
+                if (isset($messages[$body['filter_type']])) {
+                    exit($messages[$body['filter_type']]);
+                }
+            }
+            
+
+            if (!empty($body['url_white_page']) && !empty($body['url_offer_page'])) {
+                // Set page type flags
+                if ($body['filter_page'] == 'white') {
+                    $is_white_page = true;
+                } elseif ($body['filter_page'] == 'offer') {
+                    $is_offer_page = true;
+                }
+            } else {
+                exit('Offer Page or White Page Not Found.');
             }
         } else {
-            exit('Offer Page or White Page Not Found.');
+            // Default to offer page if cloaking service is unavailable
+            $is_offer_page = true;
         }
-    } else {
-        // Default to offer page if cloaking service is unavailable
-        $is_offer_page = true;
     }
 ?>
 <!DOCTYPE html>
